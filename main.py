@@ -4,9 +4,41 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from pipelines.phase1 import run_discovery_phase
+from pipelines.debate import run_debate_phase
+from gates.hitl_gates import gate1_notify, gate1_parse_verdict
+from config.settings import OUTPUT_DIR, DEBATE_CONFIDENCE_THRESHOLD
 
 if __name__ == "__main__":
     print("🚀 ProdAgentCo Phase 1 — Discovery Cycle Starting...")
-    result = run_discovery_phase()
-    print("\n✅ Discovery complete. Check outputs/ for artifacts.")
-    print(result)
+    discovery_result = run_discovery_phase()
+
+    output_file = OUTPUT_DIR / "discovery-brief.md"
+    with open(output_file, "w") as f:
+        f.write(str(discovery_result))
+    print(f"\n✅ Discovery complete. Brief saved to {output_file}")
+
+    print("\n🎯 Starting CEO Debate Phase...")
+    debate_result = run_debate_phase()
+
+    verdict_file = OUTPUT_DIR / "debate-verdict.md"
+    with open(verdict_file, "w") as f:
+        f.write(str(debate_result))
+    print(f"\n✅ Debate complete. Verdict saved to {verdict_file}")
+
+    # Parse real verdict and fire Gate 1 if needed
+    parsed = gate1_parse_verdict(str(debate_result))
+    avg_conf = parsed["avg_confidence"]
+    verdict = parsed["verdict"]
+
+    print(f"\n📊 CEO Verdict: {verdict} | Avg Confidence: {avg_conf}")
+
+    if verdict != "GO" or avg_conf < DEBATE_CONFIDENCE_THRESHOLD:
+        print("📱 Firing Gate 1 HITL notification...")
+        gate1_notify(
+            verdict=verdict,
+            avg_confidence=avg_conf,
+            lead_opportunity="See discovery-brief.md for full details",
+            agent_scores=parsed.get("agent_scores", {})
+        )
+    else:
+        print("✅ CEO confidence above threshold — proceeding autonomously to Planning")

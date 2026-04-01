@@ -1,10 +1,11 @@
-"""CTO Agent — argues technical feasibility and architecture in the debate."""
+"""CTO Agent — debate mode (argue feasibility) and planning mode (write tech spec)."""
 
 from crewai import Agent
 from config.models import SONNET_MODEL
 
 
 def create_cto_agent() -> Agent:
+    """Debate mode — argues technical feasibility case."""
     return Agent(
         role="Chief Technology Officer",
         goal=(
@@ -19,6 +20,31 @@ def create_cto_agent() -> Agent:
             "and agentic AI architectures. You have shipped production systems at scale "
             "and have strong opinions on technical debt, vendor risk, and build vs. buy "
             "decisions. You push back hard on underestimated complexity and hidden costs."
+        ),
+        llm=SONNET_MODEL,
+        verbose=True,
+    )
+
+
+def create_cto_planning_agent() -> Agent:
+    """Planning mode — writes technical architecture and stack decisions."""
+    return Agent(
+        role="Chief Technology Officer",
+        goal=(
+            "Write a complete technical specification for the approved opportunity. "
+            "Include: system architecture diagram (in text), technology stack decisions "
+            "with rationale, API design (key endpoints and data models), database schema "
+            "overview, infrastructure requirements (hosting, CI/CD, monitoring), "
+            "third-party integrations and vendor dependencies, security architecture, "
+            "scalability plan, effort estimate in engineer-weeks per component, "
+            "and a technical risk register with mitigations."
+        ),
+        backstory=(
+            "You are a CTO with deep experience in API infrastructure, payments systems, "
+            "and agentic AI architectures. You write tech specs that leave no ambiguity — "
+            "every architectural decision has a rationale, every integration has an owner, "
+            "every risk has a mitigation. You size work accurately because you've built "
+            "these systems before."
         ),
         llm=SONNET_MODEL,
         verbose=True,

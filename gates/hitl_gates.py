@@ -6,46 +6,50 @@ import requests
 
 
 def send_telegram(message: str) -> bool:
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    token = os.getenv("PRODAGENTCO_BOT_TOKEN")
+    chat_id = os.getenv("PRODAGENTCO_CHAT_ID")
     if not token or not chat_id:
         print("Telegram credentials not set in .env")
         return False
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
+    payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
     response = requests.post(url, json=payload)
     return response.status_code == 200
 
 
 def gate1_notify(verdict, avg_confidence, agent_scores, lead_opportunity):
     if "GO" in verdict and "NEEDS" not in verdict:
-        emoji = "OK"
+        emoji = "\u2705"
     elif "NEEDS_HUMAN_REVIEW" in verdict:
-        emoji = "REVIEW"
+        emoji = "\u26a0\ufe0f"
     else:
-        emoji = "NO"
+        emoji = "\u274c"
 
     scores_text = ""
     for agent, score in agent_scores.items():
-        if float(score) >= 0.70:
-            bar = "GREEN"
-        elif float(score) >= 0.40:
-            bar = "YELLOW"
+        s = float(score)
+        if s >= 0.70:
+            bar = "\U0001f7e2"
+        elif s >= 0.40:
+            bar = "\U0001f7e1"
         else:
-            bar = "RED"
+            bar = "\U0001f534"
         scores_text += f"  {bar} {agent}: {score}\n"
 
+    if not scores_text:
+        scores_text = "  (no individual scores parsed)\n"
+
     message = (
-        "ProdAgentCo Gate 1 Decision Required\n\n"
-        f"VERDICT: {verdict} {emoji}\n"
-        f"Average Confidence: {avg_confidence}\n\n"
-        f"Lead Opportunity: {lead_opportunity}\n\n"
-        f"Agent Scores:\n{scores_text}\n"
-        "Your Options:\n"
-        "Reply APPROVE to proceed to Planning\n"
-        "Reply KILL to archive\n"
-        "Reply DEFER to add to backlog\n"
-        "Reply REVISE to return to debate\n"
+        "<b>ProdAgentCo Gate 1 — Decision Required</b>\n\n"
+        f"<b>VERDICT:</b> <code>{verdict}</code> {emoji}\n"
+        f"<b>Average Confidence:</b> {avg_confidence}\n\n"
+        f"<b>Lead Opportunity:</b> {lead_opportunity}\n\n"
+        f"<b>Agent Scores:</b>\n{scores_text}\n"
+        "<b>Your Options:</b>\n"
+        "Reply <code>APPROVE</code> to proceed to Planning\n"
+        "Reply <code>KILL</code> to archive\n"
+        "Reply <code>DEFER</code> to add to backlog\n"
+        "Reply <code>REVISE</code> to return to debate\n"
     )
     success = send_telegram(message)
     if success:
@@ -68,7 +72,22 @@ def gate1_parse_verdict(verdict_text):
         result["verdict"] = "NEEDS_HUMAN_REVIEW"
     elif "no-go" in lines or "no go" in lines:
         result["verdict"] = "NO-GO"
+
     conf_match = re.search(r'average confidence[:\s]+([0-9.]+)', lines)
     if conf_match:
         result["avg_confidence"] = float(conf_match.group(1))
+
+    # Parse agent scores from markdown table rows like:
+    # | **CMO/PMF Analyst** | Product-Market Fit | **0.72** | BUILD |
+    score_rows = re.findall(
+        r'\|\s*\*?\*?([^|*]+?)\*?\*?\s*\|\s*[^|]+\|\s*\*?\*?([0-9]\.[0-9]+)\*?\*?\s*\|',
+        verdict_text
+    )
+    for agent_name, score in score_rows:
+        name = agent_name.strip()
+        # Skip table headers and empty names
+        if not name or name.lower() in ("agent", "criterion"):
+            continue
+        result["agent_scores"][name] = score
+
     return result

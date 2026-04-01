@@ -8,6 +8,7 @@ from agents.planning.marketing import create_marketing_planning_agent
 from agents.planning.brand_manager import create_brand_manager_agent
 from agents.planning.designer import create_designer_agent
 from agents.planning.legal import create_legal_planning_agent
+from gates.hitl_gates import gate2_notify
 from config.settings import OUTPUT_DIR
 
 
@@ -208,4 +209,9 @@ def run_planning_phase() -> str:
     )
 
     print(f"\n✅ Planning complete. 7 deliverables saved to {PLANNING_DIR}/")
+
+    # Fire Gate 2 HITL notification
+    print("📱 Firing Gate 2 notification...")
+    gate2_notify(PLANNING_DIR)
+
     return result

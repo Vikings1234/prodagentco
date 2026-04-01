@@ -10,7 +10,7 @@ from config.settings import OUTPUT_DIR, LOG_DIR
 
 app = Flask(__name__)
 
-VALID_COMMANDS = {"APPROVE", "KILL", "DEFER", "REVISE"}
+VALID_COMMANDS = {"APPROVE", "KILL", "DEFER", "REVISE", "APPROVE2", "REVISE2"}
 
 
 def log_decision(command: str, chat_id: int, text: str):
@@ -98,11 +98,30 @@ def handle_revise():
     print(f"✅ Revised debate saved to {verdict_file}")
 
 
+def handle_approve2():
+    """Trigger the build phase (Phase 3)."""
+    try:
+        from pipelines.build import run_build_phase
+        print("🚀 APPROVE2 received — launching Build phase...")
+        run_build_phase()
+    except ImportError:
+        print("⏳ APPROVE2 received — run_build_phase() not yet implemented, logged for now.")
+
+
+def handle_revise2():
+    """Re-run the planning phase."""
+    from pipelines.planning import run_planning_phase
+    print("🔄 REVISE2 received — re-running planning phase...")
+    run_planning_phase()
+
+
 HANDLERS = {
     "APPROVE": handle_approve,
     "KILL": handle_kill,
     "DEFER": handle_defer,
     "REVISE": handle_revise,
+    "APPROVE2": handle_approve2,
+    "REVISE2": handle_revise2,
 }
 
 CONFIRMATIONS = {
@@ -110,6 +129,8 @@ CONFIRMATIONS = {
     "KILL": "🗄️ *KILLED* — opportunity archived.",
     "DEFER": "📋 *DEFERRED* — added to backlog for later review.",
     "REVISE": "🔄 *REVISE* — re-running debate phase. You'll get a new verdict shortly.",
+    "APPROVE2": "✅ *APPROVED (Gate 2)* — proceeding to Build phase.",
+    "REVISE2": "🔄 *REVISE (Gate 2)* — re-running planning phase.",
 }
 
 

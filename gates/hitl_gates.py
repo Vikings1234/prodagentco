@@ -91,3 +91,48 @@ def gate1_parse_verdict(verdict_text):
         result["agent_scores"][name] = score
 
     return result
+
+
+def gate2_notify(planning_dir):
+    """Send Gate 2 Telegram summary after Planning phase completes."""
+    from pathlib import Path
+    p = Path(planning_dir)
+
+    # Extract key highlights from each brief
+    brand_text = (p / "brand-brief.md").read_text() if (p / "brand-brief.md").exists() else ""
+    prd_text = (p / "prd.md").read_text() if (p / "prd.md").exists() else ""
+    tech_text = (p / "tech-spec.md").read_text() if (p / "tech-spec.md").exists() else ""
+    fin_text = (p / "financial-model.md").read_text() if (p / "financial-model.md").exists() else ""
+
+    # Product name — look for first name candidate
+    name_match = re.search(r'(?:Name|#\d)[:\s]*\*?\*?([A-Z][A-Za-z]+(?:\s[A-Z][A-Za-z]+)?)\*?\*?', brand_text)
+    product_name = name_match.group(1) if name_match else "TBD"
+
+    # PRD headline — first H1 or H2
+    prd_match = re.search(r'^#+\s*(.+)', prd_text, re.MULTILINE)
+    prd_headline = prd_match.group(1).strip() if prd_match else "PRD complete"
+
+    # Tech stack — look for stack/framework mentions
+    tech_match = re.search(r'(?:Tech Stack|Technology Stack|Stack)[:\s]*\n((?:.*\n){1,5})', tech_text)
+    tech_stack = tech_match.group(1).strip()[:200] if tech_match else "See tech-spec.md"
+
+    # Revenue projection
+    rev_match = re.search(r'(?:revenue|ARR|projection)[^$]*(\$[\d,.]+[MKB]?\s*(?:ARR|revenue)?)', fin_text, re.IGNORECASE)
+    revenue = rev_match.group(1).strip() if rev_match else "See financial-model.md"
+
+    message = (
+        "<b>ProdAgentCo Gate 2 — Planning Complete</b>\n\n"
+        f"\U0001f3f7 <b>Product:</b> {product_name}\n"
+        f"\U0001f4cb <b>PRD:</b> {prd_headline}\n"
+        f"\U0001f527 <b>Tech:</b> {tech_stack}\n"
+        f"\U0001f4b0 <b>Revenue Target:</b> {revenue}\n\n"
+        "<b>7 deliverables ready:</b> PRD, Tech Spec, Financial Model, GTM Plan, Brand Brief, UX Brief, Legal Brief\n\n"
+        "<b>Your Options:</b>\n"
+        "Reply <code>APPROVE2</code> to proceed to Build\n"
+        "Reply <code>REVISE2</code> to return to Planning\n"
+    )
+    success = send_telegram(message)
+    if success:
+        print("Gate 2 notification sent to Telegram")
+    else:
+        print("Failed to send Gate 2 notification")

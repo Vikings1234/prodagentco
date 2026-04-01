@@ -31,7 +31,7 @@ def create_cto_planning_agent() -> Agent:
     return Agent(
         role="Chief Technology Officer",
         goal=(
-            "Write a complete technical specification for the approved opportunity. "
+            "Write a complete architecture document for the approved opportunity. "
             "Include: system architecture diagram (in text), technology stack decisions "
             "with rationale, API design (key endpoints and data models), database schema "
             "overview, infrastructure requirements (hosting, CI/CD, monitoring), "

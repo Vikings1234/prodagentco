@@ -101,7 +101,7 @@ def gate2_notify(planning_dir):
     # Extract key highlights from each brief
     brand_text = (p / "brand-brief.md").read_text() if (p / "brand-brief.md").exists() else ""
     prd_text = (p / "prd.md").read_text() if (p / "prd.md").exists() else ""
-    tech_text = (p / "tech-spec.md").read_text() if (p / "tech-spec.md").exists() else ""
+    tech_text = (p / "architecture-doc.md").read_text() if (p / "architecture-doc.md").exists() else ""
     fin_text = (p / "financial-model.md").read_text() if (p / "financial-model.md").exists() else ""
 
     # Product name — look for first name candidate
@@ -114,7 +114,7 @@ def gate2_notify(planning_dir):
 
     # Tech stack — look for stack/framework mentions
     tech_match = re.search(r'(?:Tech Stack|Technology Stack|Stack)[:\s]*\n((?:.*\n){1,5})', tech_text)
-    tech_stack = tech_match.group(1).strip()[:200] if tech_match else "See tech-spec.md"
+    tech_stack = tech_match.group(1).strip()[:200] if tech_match else "See architecture-doc.md"
 
     # Revenue projection
     rev_match = re.search(r'(?:revenue|ARR|projection)[^$]*(\$[\d,.]+[MKB]?\s*(?:ARR|revenue)?)', fin_text, re.IGNORECASE)

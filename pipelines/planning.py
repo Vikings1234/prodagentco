@@ -73,7 +73,7 @@ def run_planning_phase() -> str:
         ),
         agent=cto,
         context=[pm_task],
-        output_file=str(PLANNING_DIR / "tech-spec.md"),
+        output_file=str(PLANNING_DIR / "architecture-doc.md"),
     )
 
     cfo_task = Task(
@@ -166,7 +166,7 @@ def run_planning_phase() -> str:
     # Map tasks to output filenames for manual file writing
     task_files = [
         (pm_task, "prd.md"),
-        (cto_task, "tech-spec.md"),
+        (cto_task, "architecture-doc.md"),
         (cfo_task, "financial-model.md"),
         (marketing_task, "gtm-plan.md"),
         (brand_task, "brand-brief.md"),
@@ -199,7 +199,7 @@ def run_planning_phase() -> str:
         "# ProdAgentCo Planning Summary\n\n"
         "## Deliverables\n"
         "- [PRD](prd.md)\n"
-        "- [Tech Spec](tech-spec.md)\n"
+        "- [Architecture Doc](architecture-doc.md)\n"
         "- [Financial Model](financial-model.md)\n"
         "- [GTM Plan](gtm-plan.md)\n"
         "- [Brand Brief](brand-brief.md)\n"

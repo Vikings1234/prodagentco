@@ -7,6 +7,28 @@ from pipelines.phase1 import run_discovery_phase
 from pipelines.debate import run_debate_phase
 from gates.hitl_gates import gate1_notify, gate1_parse_verdict
 from config.settings import OUTPUT_DIR, DEBATE_CONFIDENCE_THRESHOLD
+import subprocess
+import datetime
+
+def commit_and_push_outputs():
+    """Silently commit and push the outputs/ folder to GitHub."""
+    try:
+        # Run git add outputs/
+        subprocess.run(['git', 'add', 'outputs/'], check=True, capture_output=True)
+        
+        # Get timestamp
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Run git commit
+        commit_msg = f"Pipeline run — {timestamp}"
+        subprocess.run(['git', 'commit', '-m', commit_msg], check=True, capture_output=True)
+        
+        # Run git push
+        subprocess.run(['git', 'push'], check=True, capture_output=True)
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Git operation failed: {e}")
+        print(f"Error output: {e.stderr.decode() if e.stderr else 'None'}")
 
 if __name__ == "__main__":
     print("🚀 ProdAgentCo Phase 1 — Discovery Cycle Starting...")
@@ -24,6 +46,9 @@ if __name__ == "__main__":
     with open(verdict_file, "w") as f:
         f.write(str(debate_result))
     print(f"\n✅ Debate complete. Verdict saved to {verdict_file}")
+
+    # Commit and push outputs to GitHub
+    commit_and_push_outputs()
 
     # Parse real verdict and fire Gate 1 if needed
     parsed = gate1_parse_verdict(str(debate_result))

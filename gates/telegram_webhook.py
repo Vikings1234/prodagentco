@@ -160,6 +160,47 @@ def telegram_webhook():
     return jsonify({"ok": True}), 200
 
 
+@app.route("/run", methods=["POST"])
+def trigger_run():
+    """Trigger a full pipeline run from the dashboard."""
+    data = request.get_json(silent=True) or {}
+    domain = data.get("domain", "agentic-payments")
+    custom_query = data.get("customQuery")
+
+    import threading
+
+    def run_pipeline():
+        from pipelines.phase1 import run_discovery_phase
+        from pipelines.debate import run_debate_phase
+        from gates.hitl_gates import gate1_notify, gate1_parse_verdict
+        from config.settings import DEBATE_CONFIDENCE_THRESHOLD
+
+        print(f"\n🚀 Dashboard-triggered run — domain: {domain}")
+        result = run_discovery_phase(domain=domain, custom_query=custom_query)
+
+        output_file = OUTPUT_DIR / "discovery-brief.md"
+        output_file.write_text(str(result))
+
+        debate_result = run_debate_phase()
+        verdict_file = OUTPUT_DIR / "debate-verdict.md"
+        verdict_file.write_text(str(debate_result))
+
+        parsed = gate1_parse_verdict(str(debate_result))
+        avg_conf = parsed["avg_confidence"]
+        verdict = parsed["verdict"]
+
+        if verdict != "GO" or avg_conf < DEBATE_CONFIDENCE_THRESHOLD:
+            gate1_notify(
+                verdict=verdict,
+                avg_confidence=avg_conf,
+                lead_opportunity="See discovery-brief.md for full details",
+                agent_scores=parsed.get("agent_scores", {})
+            )
+
+    threading.Thread(target=run_pipeline, daemon=True).start()
+    return jsonify({"ok": True, "domain": domain, "status": "started"}), 200
+
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"}), 200

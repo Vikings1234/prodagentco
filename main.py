@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ProdAgentCo — Phase 1 entry point."""
+import sys
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -31,8 +32,12 @@ def commit_and_push_outputs():
         print(f"Error output: {e.stderr.decode() if e.stderr else 'None'}")
 
 if __name__ == "__main__":
-    print("🚀 ProdAgentCo Phase 1 — Discovery Cycle Starting...")
-    discovery_result = run_discovery_phase()
+    # Accept domain and custom query from CLI: python main.py <domain> [custom_query]
+    domain = sys.argv[1] if len(sys.argv) > 1 else "agentic-payments"
+    custom_query = sys.argv[2] if len(sys.argv) > 2 else None
+
+    print(f"🚀 ProdAgentCo Phase 1 — Discovery Cycle Starting (domain: {domain})...")
+    discovery_result = run_discovery_phase(domain=domain, custom_query=custom_query)
 
     output_file = OUTPUT_DIR / "discovery-brief.md"
     with open(output_file, "w") as f:

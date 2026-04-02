@@ -64,10 +64,22 @@ if __name__ == "__main__":
 
     if verdict != "GO" or avg_conf < DEBATE_CONFIDENCE_THRESHOLD:
         print("📱 Firing Gate 1 HITL notification...")
+
+        # Extract lead opportunity title from discovery brief
+        brief_path = OUTPUT_DIR / "discovery-brief.md"
+        lead_opp = "See discovery-brief.md"
+        if brief_path.exists():
+            import re as _re
+            brief_text = brief_path.read_text()
+            title_match = (_re.search(r'RANK 1[:\s]*(?:\*\*)?([^*\n]+)', brief_text)
+                or _re.search(r'LEAD RECOMMENDATION[:\s]*(?:Opportunity #\d+\s*—?\s*)?(.+)', brief_text))
+            if title_match:
+                lead_opp = title_match.group(1).replace('**', '').strip()
+
         gate1_notify(
             verdict=verdict,
             avg_confidence=avg_conf,
-            lead_opportunity="See discovery-brief.md for full details",
+            lead_opportunity=lead_opp,
             agent_scores=parsed.get("agent_scores", {})
         )
     else:

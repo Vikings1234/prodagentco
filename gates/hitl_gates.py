@@ -65,28 +65,34 @@ def gate1_parse_verdict(verdict_text):
         "lead_opportunity": "Unknown",
         "agent_scores": {}
     }
-    lines = verdict_text.lower()
-    if "final decision: go" in lines and "needs_human_review" not in lines:
-        result["verdict"] = "GO"
-    elif "needs_human_review" in lines:
+
+    # Verdict — handle "FINAL VERDICT:", "VERDICT:", "FINAL DECISION:" formats
+    lower = verdict_text.lower()
+    if "needs_human_review" in lower:
         result["verdict"] = "NEEDS_HUMAN_REVIEW"
-    elif "no-go" in lines or "no go" in lines:
+    elif re.search(r'(?:verdict|decision)[:\s]*\*?\*?\s*go\b', lower) and "no-go" not in lower and "no go" not in lower:
+        result["verdict"] = "GO"
+    elif "no-go" in lower or "no go" in lower:
         result["verdict"] = "NO-GO"
 
-    conf_match = re.search(r'average confidence[:\s]+([0-9.]+)', lines)
+    # Confidence — handle "Average Confidence Score: 0.688" with optional ** wrapping
+    # Also handle "= 0.64**" at end of calculation line
+    conf_match = re.search(r'=\s*(0\.\d+)\*?\*?\s*$', verdict_text, re.MULTILINE)
+    if not conf_match:
+        conf_match = re.search(r'[Aa]verage [Cc]onfidence[^0-9]*?(0\.\d+)', verdict_text)
     if conf_match:
         result["avg_confidence"] = float(conf_match.group(1))
 
-    # Parse agent scores from markdown table rows like:
-    # | **CMO/PMF Analyst** | Product-Market Fit | **0.72** | BUILD |
+    # Agent scores — match table rows with ** wrapped names and scores
+    # Handles: | **CMO/PMF Analyst** | Role | **0.72** | BUILD |
+    # And:     | Product Market Fit Agent | Role | **0.68** | BUILD |
     score_rows = re.findall(
         r'\|\s*\*?\*?([^|*]+?)\*?\*?\s*\|\s*[^|]+\|\s*\*?\*?([0-9]\.[0-9]+)\*?\*?\s*\|',
         verdict_text
     )
     for agent_name, score in score_rows:
         name = agent_name.strip()
-        # Skip table headers and empty names
-        if not name or name.lower() in ("agent", "criterion"):
+        if not name or name.lower() in ("agent", "criterion", ""):
             continue
         result["agent_scores"][name] = score
 

@@ -14,7 +14,7 @@ app = Flask(__name__)
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, ngrok-skip-browser-warning"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return response
 
@@ -213,12 +213,16 @@ def telegram_webhook():
     return jsonify({"ok": True}), 200
 
 
-@app.route("/run", methods=["POST"])
+@app.route("/run", methods=["POST", "OPTIONS"])
 def trigger_run():
     """Trigger a full pipeline run from the dashboard."""
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+
     data = request.get_json(silent=True) or {}
     domain = data.get("domain", "agentic-payments")
     custom_query = data.get("customQuery")
+    print(f"\n📡 Received /run request — domain: {domain}, customQuery: {custom_query}")
 
     import threading
 

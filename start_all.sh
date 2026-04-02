@@ -56,7 +56,8 @@ if [ -f "$DASHBOARD_ENV" ]; then
 fi
 
 # 3c. Update Vercel env var and redeploy dashboard
-source "$ENVFILE" 2>/dev/null
+VERCEL_TOKEN=$(grep "^VERCEL_TOKEN=" "$ENVFILE" | cut -d'=' -f2-)
+VERCEL_PROJECT_ID=$(grep "^VERCEL_PROJECT_ID=" "$ENVFILE" | cut -d'=' -f2-)
 if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
     echo ""
     echo "🔄 Updating Vercel NEXT_PUBLIC_PIPELINE_URL..."
@@ -90,17 +91,34 @@ for e in envs:
     fi
     echo "✅ Vercel env var updated → NEXT_PUBLIC_PIPELINE_URL=$NGROK_URL"
 
+    # Get repoId for deploy API
+    REPO_ID=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+        "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID" \
+        | python3 -c "import sys,json; print(json.load(sys.stdin).get('link',{}).get('repoId',''))" 2>/dev/null)
+
     # Trigger redeploy
     DEPLOY_RESULT=$(curl -s -X POST \
         -H "Authorization: Bearer $VERCEL_TOKEN" \
         -H "Content-Type: application/json" \
-        -d "{\"name\":\"prodagentco-dashboard\",\"project\":\"$VERCEL_PROJECT_ID\",\"target\":\"production\",\"gitSource\":{\"type\":\"github\",\"repo\":\"Vikings1234/prodagentco-dashboard\",\"ref\":\"main\"}}" \
+        -d "{\"name\":\"prodagentco-dashboard\",\"project\":\"$VERCEL_PROJECT_ID\",\"target\":\"production\",\"gitSource\":{\"type\":\"github\",\"repoId\":\"$REPO_ID\",\"ref\":\"main\"}}" \
         "https://api.vercel.com/v13/deployments")
-    DEPLOY_URL=$(echo "$DEPLOY_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('url',''))" 2>/dev/null)
+    DEPLOY_URL=$(echo "$DEPLOY_RESULT" | python3 -c "
+import sys, json, re
+raw = sys.stdin.read()
+clean = re.sub(r'[\x00-\x1f\x7f]', '', raw)
+try:
+    print(json.loads(clean).get('url',''))
+except: pass
+" 2>/dev/null)
     if [ -n "$DEPLOY_URL" ]; then
         echo "🚀 Vercel redeploy triggered → https://$DEPLOY_URL"
     else
-        echo "⚠️  Redeploy may have failed — check Vercel dashboard"
+        # Check if the response had alias (still a success)
+        if echo "$DEPLOY_RESULT" | grep -q '"alias"'; then
+            echo "🚀 Vercel redeploy triggered successfully"
+        else
+            echo "⚠️  Redeploy may have failed — check Vercel dashboard"
+        fi
     fi
 else
     echo ""

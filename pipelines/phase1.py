@@ -169,5 +169,53 @@ def run_discovery_phase(domain: str = "agentic-payments", custom_query: str = No
     )
 
     result = crew.kickoff()
-    return str(result)
+    result_text = str(result)
+
+    # Generate a business-friendly opportunity name from the technical title
+    result_text = _add_friendly_title(result_text)
+
+    return result_text
+
+
+def _add_friendly_title(brief_text: str) -> str:
+    """Use Haiku to generate a business-friendly opportunity name and prepend it to the brief."""
+    import re as _re
+
+    # Extract the technical title from LEAD RECOMMENDATION
+    lines = brief_text.split('\n')
+    tech_title = ''
+    tam = ''
+    for i, line in enumerate(lines):
+        if 'LEAD RECOMMENDATION' in line:
+            for j in range(i + 1, min(i + 4, len(lines))):
+                if lines[j].strip().startswith('#'):
+                    tech_title = lines[j].replace('#', '').strip()
+                    break
+        tam_match = _re.search(r'TAM:\s*([^|]+)', line)
+        if tam_match and not tam:
+            tam = tam_match.group(1).strip()
+
+    if not tech_title:
+        return brief_text
+
+    print(f"🏷️  Generating friendly title for: {tech_title}")
+
+    response = litellm.completion(
+        model=HAIKU_MODEL,
+        messages=[{"role": "user", "content": (
+            f"Rewrite this technical opportunity title into a short, compelling business headline "
+            f"that a non-technical executive or recruiter would immediately understand. "
+            f"Max 12 words. Include the market size if available.\n\n"
+            f"Technical title: \"{tech_title}\"\n"
+            f"Market size: {tam or 'unknown'}\n\n"
+            f"Return ONLY the headline, nothing else."
+        )}],
+        temperature=0.5,
+    )
+    friendly = response.choices[0].message.content.strip().strip('"')
+    print(f"✅ Friendly title: {friendly}")
+
+    # Prepend friendly title metadata to the brief
+    metadata = f"<!-- friendly_title: {friendly} -->\n"
+    return metadata + brief_text
 

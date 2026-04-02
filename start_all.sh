@@ -48,6 +48,13 @@ else
 fi
 echo "📝 Updated .env → WEBHOOK_URL=$NGROK_URL"
 
+# 3b. Also update dashboard .env.local if it exists
+DASHBOARD_ENV="$(dirname "$0")/../prodagentco-dashboard/.env.local"
+if [ -f "$DASHBOARD_ENV" ]; then
+    sed -i '' "s|^NEXT_PUBLIC_PIPELINE_URL=.*|NEXT_PUBLIC_PIPELINE_URL=$NGROK_URL|" "$DASHBOARD_ENV"
+    echo "📝 Updated dashboard .env.local → NEXT_PUBLIC_PIPELINE_URL=$NGROK_URL"
+fi
+
 # 4. Start Flask webhook server
 echo ""
 source "$(dirname "$0")/venv/bin/activate"

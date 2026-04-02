@@ -136,3 +136,48 @@ def gate2_notify(planning_dir):
         print("Gate 2 notification sent to Telegram")
     else:
         print("Failed to send Gate 2 notification")
+
+
+def gate3_notify(build_dir):
+    """Send Gate 3 Telegram summary after Build phase completes."""
+    from pathlib import Path
+    p = Path(build_dir)
+
+    codebase_text = (p / "codebase.md").read_text() if (p / "codebase.md").exists() else ""
+    qa_text = (p / "qa-report.md").read_text() if (p / "qa-report.md").exists() else ""
+    security_text = (p / "security-report.md").read_text() if (p / "security-report.md").exists() else ""
+
+    # Count files in codebase
+    file_count = codebase_text.count("## ") if codebase_text else 0
+    code_size = f"{len(codebase_text):,} chars"
+
+    # QA verdict
+    qa_match = re.search(r'(?:verdict|overall)[:\s]*\*?\*?(PASS|FAIL|CONDITIONAL)\*?\*?', qa_text, re.IGNORECASE)
+    qa_verdict = qa_match.group(1).upper() if qa_match else "See qa-report.md"
+
+    # QA score
+    score_match = re.search(r'(?:quality score|score)[:\s]*\*?\*?(\d+(?:\.\d+)?)\s*(?:/\s*10)?', qa_text, re.IGNORECASE)
+    qa_score = score_match.group(1) if score_match else "N/A"
+
+    # Security rating
+    sec_match = re.search(r'(?:risk rating|overall)[:\s]*\*?\*?(CRITICAL|HIGH|MEDIUM|LOW)\*?\*?', security_text, re.IGNORECASE)
+    sec_rating = sec_match.group(1).upper() if sec_match else "See security-report.md"
+
+    # Security findings count
+    findings_count = len(re.findall(r'(?:CRITICAL|HIGH|MEDIUM|LOW)\s*\|', security_text, re.IGNORECASE))
+
+    message = (
+        "<b>ProdAgentCo Gate 3 — Build Complete</b>\n\n"
+        f"\U0001f4e6 <b>Codebase:</b> ~{file_count} files, {code_size}\n"
+        f"\u2705 <b>QA Verdict:</b> {qa_verdict} (score: {qa_score}/10)\n"
+        f"\U0001f6e1 <b>Security:</b> {sec_rating} ({findings_count} findings)\n\n"
+        "<b>3 deliverables ready:</b> Codebase, QA Report, Security Report\n\n"
+        "<b>Your Options:</b>\n"
+        "Reply <code>APPROVE3</code> to deploy to Vercel\n"
+        "Reply <code>REVISE3</code> to re-run Build phase\n"
+    )
+    success = send_telegram(message)
+    if success:
+        print("Gate 3 notification sent to Telegram")
+    else:
+        print("Failed to send Gate 3 notification")

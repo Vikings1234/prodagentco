@@ -18,7 +18,7 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return response
 
-VALID_COMMANDS = {"APPROVE", "KILL", "DEFER", "REVISE", "APPROVE2", "REVISE2"}
+VALID_COMMANDS = {"APPROVE", "KILL", "DEFER", "REVISE", "APPROVE2", "REVISE2", "APPROVE3", "REVISE3"}
 
 
 def log_decision(command: str, chat_id: int, text: str):
@@ -108,12 +108,9 @@ def handle_revise():
 
 def handle_approve2():
     """Trigger the build phase (Phase 3)."""
-    try:
-        from pipelines.build import run_build_phase
-        print("🚀 APPROVE2 received — launching Build phase...")
-        run_build_phase()
-    except ImportError:
-        print("⏳ APPROVE2 received — run_build_phase() not yet implemented, logged for now.")
+    from pipelines.build import run_build_phase
+    print("🚀 APPROVE2 received — launching Build phase...")
+    run_build_phase()
 
 
 def handle_revise2():
@@ -123,6 +120,50 @@ def handle_revise2():
     run_planning_phase()
 
 
+def handle_approve3():
+    """Trigger Vercel deployment after build approval."""
+    import os
+    vercel_token = os.getenv("VERCEL_TOKEN")
+    vercel_project = os.getenv("VERCEL_PROJECT_ID")
+
+    if not vercel_token or not vercel_project:
+        print("⚠️ APPROVE3 received — VERCEL_TOKEN or VERCEL_PROJECT_ID not set, skipping deploy.")
+        return
+
+    print("🚀 APPROVE3 received — triggering Vercel deployment...")
+    import requests as req
+
+    # Get repoId
+    proj_resp = req.get(
+        f"https://api.vercel.com/v9/projects/{vercel_project}",
+        headers={"Authorization": f"Bearer {vercel_token}"}
+    )
+    repo_id = proj_resp.json().get("link", {}).get("repoId", "")
+
+    # Trigger deploy
+    deploy_resp = req.post(
+        "https://api.vercel.com/v13/deployments",
+        headers={"Authorization": f"Bearer {vercel_token}", "Content-Type": "application/json"},
+        json={
+            "name": "prodagentco-dashboard",
+            "project": vercel_project,
+            "target": "production",
+            "gitSource": {"type": "github", "repoId": str(repo_id), "ref": "main"}
+        }
+    )
+    if deploy_resp.status_code == 200:
+        print("✅ Vercel deployment triggered")
+    else:
+        print(f"⚠️ Vercel deploy response: {deploy_resp.status_code}")
+
+
+def handle_revise3():
+    """Re-run the build phase."""
+    from pipelines.build import run_build_phase
+    print("🔄 REVISE3 received — re-running build phase...")
+    run_build_phase()
+
+
 HANDLERS = {
     "APPROVE": handle_approve,
     "KILL": handle_kill,
@@ -130,6 +171,8 @@ HANDLERS = {
     "REVISE": handle_revise,
     "APPROVE2": handle_approve2,
     "REVISE2": handle_revise2,
+    "APPROVE3": handle_approve3,
+    "REVISE3": handle_revise3,
 }
 
 CONFIRMATIONS = {
@@ -139,6 +182,8 @@ CONFIRMATIONS = {
     "REVISE": "🔄 *REVISE* — re-running debate phase. You'll get a new verdict shortly.",
     "APPROVE2": "✅ *APPROVED (Gate 2)* — proceeding to Build phase.",
     "REVISE2": "🔄 *REVISE (Gate 2)* — re-running planning phase.",
+    "APPROVE3": "🚀 *APPROVED (Gate 3)* — deploying to Vercel.",
+    "REVISE3": "🔄 *REVISE (Gate 3)* — re-running build phase.",
 }
 
 

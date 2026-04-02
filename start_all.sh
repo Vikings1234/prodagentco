@@ -55,6 +55,59 @@ if [ -f "$DASHBOARD_ENV" ]; then
     echo "📝 Updated dashboard .env.local → NEXT_PUBLIC_PIPELINE_URL=$NGROK_URL"
 fi
 
+# 3c. Update Vercel env var and redeploy dashboard
+source "$ENVFILE" 2>/dev/null
+if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+    echo ""
+    echo "🔄 Updating Vercel NEXT_PUBLIC_PIPELINE_URL..."
+
+    # Check if the env var already exists
+    EXISTING_ID=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+        "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env" \
+        | python3 -c "
+import sys, json
+envs = json.load(sys.stdin).get('envs', [])
+for e in envs:
+    if e.get('key') == 'NEXT_PUBLIC_PIPELINE_URL':
+        print(e['id'])
+        break
+" 2>/dev/null)
+
+    if [ -n "$EXISTING_ID" ]; then
+        # Update existing env var
+        curl -s -X PATCH \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"value\":\"$NGROK_URL\"}" \
+            "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env/$EXISTING_ID" > /dev/null
+    else
+        # Create new env var
+        curl -s -X POST \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"key\":\"NEXT_PUBLIC_PIPELINE_URL\",\"value\":\"$NGROK_URL\",\"type\":\"plain\",\"target\":[\"production\",\"preview\"]}" \
+            "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env" > /dev/null
+    fi
+    echo "✅ Vercel env var updated → NEXT_PUBLIC_PIPELINE_URL=$NGROK_URL"
+
+    # Trigger redeploy
+    DEPLOY_RESULT=$(curl -s -X POST \
+        -H "Authorization: Bearer $VERCEL_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"name\":\"prodagentco-dashboard\",\"project\":\"$VERCEL_PROJECT_ID\",\"target\":\"production\",\"gitSource\":{\"type\":\"github\",\"repo\":\"Vikings1234/prodagentco-dashboard\",\"ref\":\"main\"}}" \
+        "https://api.vercel.com/v13/deployments")
+    DEPLOY_URL=$(echo "$DEPLOY_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('url',''))" 2>/dev/null)
+    if [ -n "$DEPLOY_URL" ]; then
+        echo "🚀 Vercel redeploy triggered → https://$DEPLOY_URL"
+    else
+        echo "⚠️  Redeploy may have failed — check Vercel dashboard"
+    fi
+else
+    echo ""
+    echo "⚠️  VERCEL_TOKEN or VERCEL_PROJECT_ID not set — skipping Vercel update."
+    echo "   Set them in .env to auto-update the dashboard on each start."
+fi
+
 # 4. Start Flask webhook server
 echo ""
 source "$(dirname "$0")/venv/bin/activate"

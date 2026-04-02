@@ -1,3 +1,4 @@
+<!-- friendly_title: Payment Automation Platform Solving $1B Reliability Problem -->
 # Discovery Brief: Payment Agent Infrastructure Opportunities
 ## Executive Summary & Ranked Shortlist
 

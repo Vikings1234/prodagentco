@@ -3,123 +3,66 @@
 import os
 import json
 import requests
+import litellm
 from crewai import Crew, Task, Process
 from agents.discovery.web_research import create_web_research_agent, search_github_issues, search_product_hunt
 from agents.discovery.market_analyst import create_market_analyst_agent
 from agents.discovery.principal_pm import create_principal_pm_agent
 from config.settings import OUTPUT_DIR
+from config.models import HAIKU_MODEL
 
 
 # ---------------------------------------------------------------------------
-# Domain configs — rich, specific search parameters per vertical
+# Domain labels — human-readable names for the dashboard domain selector
 # ---------------------------------------------------------------------------
 
-DOMAIN_CONFIGS = {
-    "agentic-payments": {
-        "label": "Agentic Commerce Payments",
-        "discovery_query": (
-            "agentic commerce payment infrastructure gaps 2026: x402 protocol, AP2 agent payments, "
-            "Visa TAP-to-Phone agent wallets, MCP payments tool-use billing, autonomous agent billing "
-            "infrastructure, agent-to-agent settlement, AI agent checkout friction, machine identity "
-            "for payments, PSD3 SCA agent authentication"
-        ),
-        "github_query": "agent payment x402 OR agent wallet OR MCP payment OR autonomous billing label:feature-request OR label:enhancement state:open",
-        "subreddits": ["r/LangChain", "r/MachineLearning", "r/fintech", "r/payments", "r/cryptocurrency"],
-        "ph_category": "artificial-intelligence",
-        "serper_queries": [
-            "x402 agent payment infrastructure problems 2026",
-            "autonomous AI agent billing checkout friction site:reddit.com OR site:news.ycombinator.com",
-            "MCP payments tool-use commerce gaps 2026",
-            "PSD3 SCA machine identity agent transactions",
-            "Visa Mastercard agent wallet infrastructure 2025 2026",
-        ],
-    },
-    "sports-analytics": {
-        "label": "Sports Analytics",
-        "discovery_query": (
-            "sports analytics and betting technology gaps 2026: prediction market infrastructure, "
-            "fantasy sports pain points, real-time arbitrage detection, sharp money signal tracking, "
-            "NFL NBA MLB NHL CFB analytics platform gaps, player prop modeling, in-game betting "
-            "latency, odds compilation automation, sports data API limitations"
-        ),
-        "github_query": "sports analytics OR sports betting OR fantasy sports OR prediction market label:feature-request OR label:enhancement state:open",
-        "subreddits": ["r/sportsanalytics", "r/sportsbetting", "r/fantasyfootball", "r/nfl", "r/nba", "r/baseball", "r/CFB"],
-        "ph_category": "sports",
-        "serper_queries": [
-            "sports betting analytics tool pain points 2026 site:reddit.com",
-            "fantasy sports platform gaps developer frustration 2025 2026",
-            "real-time sports arbitrage detection infrastructure problems",
-            "NFL NBA player prop modeling data API limitations 2026",
-            "prediction market sports technology gaps site:news.ycombinator.com",
-        ],
-    },
-    "fintech": {
-        "label": "Fintech",
-        "discovery_query": (
-            "fintech infrastructure gaps 2026: embedded payments friction, lending technology automation, "
-            "mortgage process automation pain points, revenue cycle management RCM gaps, fraud detection "
-            "false positives, open banking API limitations, BNPL infrastructure problems, payment "
-            "orchestration complexity, KYC onboarding friction, real-time payments infrastructure"
-        ),
-        "github_query": "embedded payments OR lending API OR open banking OR BNPL OR fraud detection label:feature-request OR label:enhancement state:open",
-        "subreddits": ["r/fintech", "r/personalfinance", "r/smallbusiness", "r/banking", "r/accounting"],
-        "ph_category": "fintech",
-        "serper_queries": [
-            "embedded payments platform pain points 2026 site:reddit.com",
-            "open banking API developer frustration 2025 2026",
-            "mortgage automation technology gaps lending tech",
-            "fraud detection false positive rates fintech infrastructure 2026",
-            "BNPL infrastructure problems payment orchestration site:news.ycombinator.com",
-        ],
-    },
-    "healthcare": {
-        "label": "Healthcare",
-        "discovery_query": (
-            "healthcare technology gaps 2026: prior authorization automation pain points, clinical notes "
-            "AI documentation burden, dental RCM revenue cycle management gaps, patient engagement "
-            "platform friction, care coordination interoperability problems, EHR integration limitations, "
-            "telehealth platform gaps, medical billing automation, FHIR API adoption barriers"
-        ),
-        "github_query": "healthcare OR EHR OR FHIR OR clinical notes OR prior auth OR dental RCM label:feature-request OR label:enhancement state:open",
-        "subreddits": ["r/medicine", "r/healthIT", "r/dentistry", "r/telehealth", "r/nursing"],
-        "ph_category": "health",
-        "serper_queries": [
-            "prior authorization automation pain points 2026 healthcare",
-            "clinical notes AI documentation burden physician burnout 2025 2026",
-            "dental RCM revenue cycle management gaps technology",
-            "EHR interoperability FHIR API developer frustration site:reddit.com",
-            "patient engagement platform problems telehealth gaps site:news.ycombinator.com",
-        ],
-    },
+DOMAIN_LABELS = {
+    "agentic-payments": "Agentic Commerce Payments",
+    "sports-analytics": "Sports Analytics",
+    "fintech": "Fintech",
+    "healthcare": "Healthcare",
 }
 
 
-def _generate_custom_config(custom_query: str) -> dict:
-    """Use Claude Haiku to dynamically generate a domain config from a freeform query."""
-    import litellm
-    from config.models import HAIKU_MODEL
+def get_domain_config(domain: str, custom_query: str = None) -> dict:
+    """Use Claude Haiku to dynamically generate a rich search config for any domain."""
 
-    prompt = f"""You are a market research strategist. Given this product domain or problem description, generate a JSON config for a market research scan.
+    # Resolve the domain description Haiku will reason about
+    if domain == "custom" and custom_query:
+        domain_description = custom_query
+    elif domain in DOMAIN_LABELS:
+        domain_description = DOMAIN_LABELS[domain]
+    else:
+        domain_description = domain
 
-Domain/problem: "{custom_query}"
+    print(f"🤖 Generating domain config for: {domain_description}")
 
-Return ONLY valid JSON (no markdown fences) with these exact keys:
+    prompt = f"""You are a market research expert. Generate a rich discovery configuration for the domain below.
+
+Domain: "{domain_description}"
+
+Return ONLY valid JSON (no markdown fences, no explanation) with these exact keys:
 {{
   "label": "Short domain label (2-4 words)",
-  "discovery_query": "A rich 2-3 sentence research query covering the key pain points, technologies, and gaps in this domain. Be specific with product names, protocols, and technical terms. Include '2026' for recency.",
-  "github_query": "A GitHub issues search query with relevant repos/keywords, using OR operators, with label:feature-request OR label:enhancement state:open",
-  "subreddits": ["r/relevant1", "r/relevant2", "r/relevant3", "r/relevant4", "r/relevant5"],
-  "ph_category": "best matching Product Hunt category slug (e.g. 'artificial-intelligence', 'developer-tools', 'saas', 'fintech', 'health', 'marketing', 'education', 'productivity')",
+  "discovery_query": "A detailed 150-200 word search query for finding unmet needs and pain signals in this domain in 2026. Be extremely specific — name real products, protocols, APIs, standards, companies, and technical terms that practitioners actually use. Cover infrastructure gaps, developer friction, compliance pain, and unserved market segments.",
+  "github_query": "A GitHub issues search query targeting relevant repos and keywords in this domain, using OR operators, ending with label:feature-request OR label:enhancement state:open",
+  "subreddits": ["r/sub1", "r/sub2", ..., "r/sub8"],
+  "ph_category": "best matching Product Hunt category slug (one of: artificial-intelligence, developer-tools, saas, fintech, health, marketing, education, productivity, sports, design, e-commerce, crypto, social-media, analytics, hiring, legal, real-estate, food-and-drink, travel)",
   "serper_queries": [
-    "targeted google search 1 with specific terms and 2026",
-    "targeted google search 2 with site:reddit.com",
-    "targeted google search 3 with site:news.ycombinator.com",
-    "targeted google search 4 with specific pain point",
-    "targeted google search 5 with technology gap"
-  ]
+    "targeted google search 1 — specific pain point with 2026",
+    "targeted google search 2 — site:reddit.com with domain-specific terms",
+    "targeted google search 3 — site:news.ycombinator.com with technology gap",
+    "targeted google search 4 — infrastructure or tooling problem",
+    "targeted google search 5 — practitioner frustration or workflow friction"
+  ],
+  "agent_backstory": "A 3-sentence backstory for a web research agent specialized in this domain. Reference specific communities, publications, and data sources this researcher would know. Make them a credible domain expert, not a generalist."
 }}
 
-Be specific and technical. Include real product names, protocols, and community terms that practitioners in this domain would use. The searches should find real pain points from late 2025 or 2026."""
+Requirements:
+- subreddits: list 8-10 of the most active, relevant subreddits where practitioners in this domain discuss problems
+- serper_queries: each query should target a different angle (pain points, gaps, friction, infrastructure, tooling)
+- Include real product names, protocols, and community terminology
+- All searches should focus on late 2025 or 2026 content"""
 
     response = litellm.completion(
         model=HAIKU_MODEL,
@@ -130,17 +73,12 @@ Be specific and technical. Include real product names, protocols, and community 
     # Strip markdown fences if present
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0]
-    return json.loads(text)
+    config = json.loads(text)
 
-
-def get_domain_config(domain: str, custom_query: str = None) -> dict:
-    """Return a rich domain config for the given domain key or custom query."""
-    if domain == "custom" and custom_query:
-        print(f"🤖 Generating custom domain config for: {custom_query}")
-        config = _generate_custom_config(custom_query)
-        print(f"✅ Generated config for: {config.get('label', 'Custom')}")
-        return config
-    return DOMAIN_CONFIGS.get(domain, DOMAIN_CONFIGS["agentic-payments"])
+    print(f"✅ Config generated: {config.get('label', 'Unknown')}")
+    print(f"   Subreddits: {', '.join(config.get('subreddits', []))}")
+    print(f"   Searches: {len(config.get('serper_queries', []))}")
+    return config
 
 
 def run_discovery_phase(domain: str = "agentic-payments", custom_query: str = None) -> str:
@@ -184,7 +122,10 @@ def run_discovery_phase(domain: str = "agentic-payments", custom_query: str = No
 ## Query Focus: {query}
 """
 
-    web_agent = create_web_research_agent()
+    web_agent = create_web_research_agent(
+        backstory=config.get("agent_backstory"),
+        subreddits=subreddits,
+    )
     analyst_agent = create_market_analyst_agent()
     pm_agent = create_principal_pm_agent()
 

@@ -70,23 +70,30 @@ def search_product_hunt(query: str) -> str:
     return str(response.json())
 
 
-def create_web_research_agent() -> Agent:
+def create_web_research_agent(backstory: str = None, subreddits: list = None) -> Agent:
+    subreddit_str = ""
+    if subreddits:
+        subreddit_str = f" Pay special attention to these communities: {', '.join(subreddits)}."
+
+    default_backstory = (
+        "You are an expert market intelligence researcher who specializes in finding "
+        "validated pain signals from developer communities and product markets. You use "
+        "multiple data sources including GitHub issues, Product Hunt launches, Reddit "
+        "discussions, and HackerNews threads to identify real unmet needs. You excel "
+        "at distinguishing genuine pain from assumed pain."
+    )
+
     return Agent(
         role="Web Research Agent",
         goal=(
-            "Today is March 2026. Only surface opportunities that are current and relevant "
+            "Today is April 2026. Only surface opportunities that are current and relevant "
             "as of 2026. Scan Reddit, HackerNews, Product Hunt, GitHub Issues, and developer "
             "blogs for unmet needs and pain signals. Use the Serper search tool to find "
             "recent discussions. Focus on finding real pain signals with community validation. "
             "Only include opportunities with active discussion from late 2025 or 2026."
+            + subreddit_str
         ),
-        backstory=(
-            "You are an expert market intelligence researcher who specializes in finding "
-            "validated pain signals from developer communities and product markets. You use "
-            "multiple data sources including GitHub issues, Product Hunt launches, Reddit "
-            "discussions, and HackerNews threads to identify real unmet needs. You excel "
-            "at distinguishing genuine pain from assumed pain."
-        ),
+        backstory=backstory or default_backstory,
         tools=[SerperDevTool()],
         llm=HAIKU_MODEL,
         verbose=True,

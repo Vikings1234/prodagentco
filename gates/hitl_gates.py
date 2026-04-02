@@ -17,6 +17,50 @@ def send_telegram(message: str) -> bool:
     return response.status_code == 200
 
 
+def extract_lead_opportunity(brief_path=None):
+    """Extract lead opportunity title from discovery-brief.md."""
+    from pathlib import Path
+    from config.settings import OUTPUT_DIR
+
+    p = Path(brief_path) if brief_path else OUTPUT_DIR / "discovery-brief.md"
+    if not p.exists():
+        return "See discovery-brief.md"
+
+    text = p.read_text()
+    lines = text.split('\n')
+
+    # Find LEAD RECOMMENDATION line, then grab the next heading as the title
+    for i, line in enumerate(lines):
+        if 'LEAD RECOMMENDATION' in line:
+            # Check if title is on the same line (after colon and signal ID)
+            # Format: "## 🎯 LEAD RECOMMENDATION: SIGNAL_002"
+            # Or: "LEAD RECOMMENDATION: Opportunity #1 — Some Title"
+            # The real title is usually the NEXT line as a ### heading
+            for j in range(i + 1, min(i + 4, len(lines))):
+                next_line = lines[j].strip()
+                if next_line.startswith('#'):
+                    return next_line.lstrip('#').strip().replace('**', '')
+                if len(next_line) > 20 and not next_line.startswith('---'):
+                    return next_line.replace('**', '').strip()
+            # Fallback: use whatever is after the colon on the LEAD RECOMMENDATION line
+            after_colon = line.split(':', 1)[-1].strip() if ':' in line else ''
+            if after_colon:
+                return after_colon.replace('**', '').strip()
+            break
+
+    # Fallback: try RANK 1 heading
+    rank_match = re.search(r'RANK 1[:\s]*(?:\*\*)?([^*\n]{10,})', text)
+    if rank_match:
+        return rank_match.group(1).replace('**', '').strip()
+
+    # Last resort: first H3
+    h3_match = re.search(r'^###\s+(.{15,})', text, re.MULTILINE)
+    if h3_match:
+        return h3_match.group(1).replace('**', '').strip()
+
+    return "See discovery-brief.md"
+
+
 def gate1_notify(verdict, avg_confidence, agent_scores, lead_opportunity):
     if "GO" in verdict and "NEEDS" not in verdict:
         emoji = "\u2705"
@@ -75,11 +119,11 @@ def gate1_parse_verdict(verdict_text):
     elif "no-go" in lower or "no go" in lower:
         result["verdict"] = "NO-GO"
 
-    # Confidence — handle "Average Confidence Score: 0.688" with optional ** wrapping
-    # Also handle "= 0.64**" at end of calculation line
-    conf_match = re.search(r'=\s*(0\.\d+)\*?\*?\s*$', verdict_text, re.MULTILINE)
+    # Confidence — match "Average Confidence Score: 0.454" or "**Average Confidence Score: 0.688**"
+    conf_match = re.search(r'[Aa]verage [Cc]onfidence [Ss]core[:\s]*\*{0,2}\s*(0\.\d+)', verdict_text)
     if not conf_match:
-        conf_match = re.search(r'[Aa]verage [Cc]onfidence[^0-9]*?(0\.\d+)', verdict_text)
+        # Fallback: "/ 5 = 0.64**"
+        conf_match = re.search(r'/\s*\d+\s*=\s*(0\.\d+)', verdict_text)
     if conf_match:
         result["avg_confidence"] = float(conf_match.group(1))
 

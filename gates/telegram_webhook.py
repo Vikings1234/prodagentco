@@ -247,10 +247,8 @@ def trigger_run():
         verdict = parsed["verdict"]
 
         if verdict != "GO" or avg_conf < DEBATE_CONFIDENCE_THRESHOLD:
-            import re as _re
-            brief_text = (OUTPUT_DIR / "discovery-brief.md").read_text() if (OUTPUT_DIR / "discovery-brief.md").exists() else ""
-            title_m = _re.search(r'RANK 1[:\s]*(?:\*\*)?([^*\n]+)', brief_text) or _re.search(r'LEAD RECOMMENDATION[:\s]*(?:Opportunity #\d+\s*—?\s*)?(.+)', brief_text)
-            lead_opp = title_m.group(1).replace('**', '').strip() if title_m else "See discovery-brief.md"
+            from gates.hitl_gates import extract_lead_opportunity
+            lead_opp = extract_lead_opportunity()
 
             gate1_notify(
                 verdict=verdict,

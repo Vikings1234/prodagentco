@@ -6,7 +6,7 @@ load_dotenv()
 
 from pipelines.phase1 import run_discovery_phase
 from pipelines.debate import run_debate_phase
-from gates.hitl_gates import gate1_notify, gate1_parse_verdict
+from gates.hitl_gates import gate1_notify, gate1_parse_verdict, extract_lead_opportunity
 from config.settings import OUTPUT_DIR, DEBATE_CONFIDENCE_THRESHOLD
 import subprocess
 import datetime
@@ -65,16 +65,7 @@ if __name__ == "__main__":
     if verdict != "GO" or avg_conf < DEBATE_CONFIDENCE_THRESHOLD:
         print("📱 Firing Gate 1 HITL notification...")
 
-        # Extract lead opportunity title from discovery brief
-        brief_path = OUTPUT_DIR / "discovery-brief.md"
-        lead_opp = "See discovery-brief.md"
-        if brief_path.exists():
-            import re as _re
-            brief_text = brief_path.read_text()
-            title_match = (_re.search(r'RANK 1[:\s]*(?:\*\*)?([^*\n]+)', brief_text)
-                or _re.search(r'LEAD RECOMMENDATION[:\s]*(?:Opportunity #\d+\s*—?\s*)?(.+)', brief_text))
-            if title_match:
-                lead_opp = title_match.group(1).replace('**', '').strip()
+        lead_opp = extract_lead_opportunity()
 
         gate1_notify(
             verdict=verdict,

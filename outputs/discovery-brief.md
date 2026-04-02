@@ -1,4 +1,4 @@
-<!-- friendly_title: Payment Automation Platform Solving $1B Reliability Problem -->
+<!-- friendly_title: Agentic Payment Trust Layer -->
 # Discovery Brief: Payment Agent Infrastructure Opportunities
 ## Executive Summary & Ranked Shortlist
 

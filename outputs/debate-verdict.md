@@ -1,161 +1,186 @@
-# CEO FINAL DECISION: AGENTIC COMMERCE PAYMENT INFRASTRUCTURE
+# CEO FINAL DECISION: SIGNAL_007 — Agent Transaction Auditing & Observability
 
-**Classification: Investment Committee — Final Verdict**
-**Date: March 2026**
-**Chair: CEO**
+## VERDICT: **NEEDS_HUMAN_REVIEW**
 
 ---
 
-## FINAL VERDICT: **NEEDS_HUMAN_REVIEW**
+## SCORING SUMMARY
+
+| Agent | Role | Confidence Score | Vote |
+|-------|------|-----------------|------|
+| Product Market Fit Agent | PMF / Product Strategy | **0.72** | BUILD (with conditions) |
+| CTO Agent | Technical Feasibility | **0.68** | BUILD (with hard gates) |
+| CFO Agent | Financial Viability | **0.68** | BUILD (with conditions) |
+| GTM Agent | Go-to-Market Strategy | **0.68** | BUILD (with conditions) |
+| General Counsel Agent | Legal & Regulatory Risk | **0.68** | BUILD (with conditions) |
+
+**Average Confidence Score: 0.688**
+
+**Consensus Rule Check:**
+- Average ≥ 0.70? ❌ **NO** (0.688 < 0.70)
+- Any agent below 0.40? ✅ **NO** (lowest is 0.68)
+
+**Mechanical Result: NEEDS_HUMAN_REVIEW** — Average confidence falls below the 0.70 threshold required for automatic GO. No agent is below 0.40, so this is not a NO-GO. The decision requires human judgment to weigh whether the delta between 0.688 and 0.70 is material given context.
 
 ---
 
-## INDIVIDUAL AGENT CONFIDENCE SCORES
+## MY READ AS CEO: WHY I'M NOT OVERRIDING TO GO
 
-| Agent | Role | Score | Vote |
-|-------|------|-------|------|
-| **CMO/PMF Analyst** | Product-Market Fit Assessment | **0.72** | BUILD (Rank 1), DEFER (Rank 2), KILL (Rank 3) |
-| **CTO** | Technical Feasibility | **0.61** | DEFER (Rank 1 as scoped), narrow to Stripe-only |
-| **CFO** | Financial Viability | **0.58** | DEFER (pending financial validation gates) |
-| **GTM/Committee Lead** | Go-to-Market & Investment | **0.65** | CONDITIONAL BUILD |
-| **General Counsel** | Legal & Regulatory Risk | **0.64** | CONDITIONAL BUILD with mandatory legal gates |
+I want to be explicit: I could argue myself into a GO. The regulatory forcing function is real, the buyer is clear, the TAM is credible, and the execution complexity is bounded. Four out of five agents voted BUILD. The average confidence is 0.688 — two percentage points below the threshold.
 
-**Average Confidence Score: (0.72 + 0.61 + 0.58 + 0.65 + 0.64) / 5 = 0.64**
+**But I'm not overriding to GO, and here's why:**
 
----
+The 0.688 average is not a rounding error. It reflects a specific, consistent pattern across all five agents: **every single agent is flagging the same unvalidated assumption — the August 2026 regulatory deadline — and every single agent is demanding the same Week 1-2 validation gate before committing capital.** This convergence is not coincidence. It means the single highest-leverage variable in this entire thesis is still unknown.
 
-## CONSENSUS RULE APPLICATION
+If we GO now, we are committing $1.2M–$1.8M in engineering and operational capital against an assumption that no one has verified. That is not decisive leadership. That is recklessness dressed up as conviction.
 
-| Criterion | Threshold | Actual | Status |
-|-----------|-----------|--------|--------|
-| Average confidence ≥ 0.70 | 0.70 | **0.64** | ❌ BELOW THRESHOLD |
-| No agent below 0.40 | 0.40 minimum | **0.58 (CFO, lowest)** | ✅ ABOVE FLOOR |
-
-**Result:** Average confidence fails the 0.70 threshold. No agent falls below the 0.40 floor. This is the precise condition for **NEEDS_HUMAN_REVIEW** — the opportunity is not dead, but it cannot proceed on current evidence and scoping.
+The human review I'm requesting is targeted and time-boxed. This is not "go study this forever." This is "validate one thing in two weeks, then decide."
 
 ---
 
-## CEO SYNTHESIS & RATIONALE
+## SYNTHESIS OF AGENT ARGUMENTS
 
-Let me be direct about what I'm seeing here, because the agents have done serious work and the picture they've painted is coherent — not confused. This is not a case where I override the committee. This is a case where the committee is correctly identifying that we're being asked to make a $15-25M capital commitment on an 18-month roadmap that is under-validated on three critical dimensions simultaneously.
+### What the Agents Agree On (HIGH CONVICTION — CONVERGING SIGNALS)
 
-### What the Evidence Actually Shows
+**1. The Regulatory Forcing Function is the Entire Thesis**
 
-**The PMF analyst is right that the infrastructure gap is real.** PSD2/PSD3's human-in-the-loop authentication requirement is a documented architectural constraint, not a theoretical concern. Payment networks searching publicly for machine identity standards, with no winner yet, is a legitimate signal. Fortune 500 deployments hitting payment authorization friction in Q1-Q2 2026 is the closest thing to market pull we have. The B2B2D sequencing is sound. The moat thesis — first-mover standardization lock-in — has historical precedent (TLS, EMVCo, SWIFT). I give the CMO credit: this is a real pain point in search of a solution.
+All five agents independently identified the August 2026 audit trail deadline as the load-bearing column of this opportunity. The PMF agent called it "the strongest signal in this brief — pull-based demand, not push-based feature selling." The CFO agent built the entire revenue model around the deadline compressing sales cycles from 10-12 weeks to 6-8 weeks. The GTM agent centered the ICP definition on compliance officers with personal liability tied to the deadline. The CTO agent based the 14-18 week build timeline on the assumption you ship before August 2026.
 
-**The CTO is also right that the build is radically more complex than described.** The brief's 12-18 month timeline to pilot with a Tier-1 processor is not a product manager's optimism — it's a misunderstanding of how payment network integration actually works. EMVCo certification, PCI-DSS Level 1 audit, ISO 20022 migration constraints, SWIFT bureau requirements, and the unsolved engineering problem of cryptographic agent identity at scale — each of these individually would push the timeline. Together, they transform an 18-month sprint into a 36-48 month program. The CTO's recommendation to narrow to Stripe-only with OAuth 2.0 extension (not novel cryptography) is the right call. It's not as elegant, but it's executable.
+If the deadline is soft, the entire thesis degrades simultaneously across all five dimensions: PMF → no urgency, GTM → no forcing function, CFO → Year 1 revenue misses by 70%, CTO → loses the market timing justification, Legal → unclear what you're even building toward.
 
-**The CFO's concern is the one that keeps me up at night.** The $100M+ annual licensing figure in Year 2-3 is disconnected from market reality by at least two orders of magnitude. SWIFT — the closest analog — took 50 years to build the scale implied. The 2% agent commerce by 2027 assumption requires 20x growth in 14 months. Mobile payments took a decade to reach 2%. The real capital requirement ($15-25M, not $8-12M) combined with the real time-to-profitability (Year 4-5 in base case, not Year 3) changes the venture return calculus significantly. At $20M invested to reach $15M annual revenue at break-even, we're not generating venture-scale returns without a credible path to $50M+ annual revenue — which requires the aggressive adoption assumptions to actually materialize.
+**This is a single-point-of-failure thesis. That's both its strength (concentrated upside) and its risk (concentrated downside).**
 
-**The General Counsel has surfaced the one risk that none of the other agents adequately addressed: we don't have a liability framework for a single agent-initiated transaction yet.** No insurance product covers this. Processor terms of service explicitly exclude or are silent on AI agent transactions. Wire fraud statute exposure is real if we "facilitate" a transaction that later proves to be an OFAC violation. The absence of a chargeback reserve fund ($2-5M) isn't a detail — it's a gap that could sink the company on the first large-scale incident. And the SCA incompatibility under PSD3 is not a negotiation problem — it's a potential regulatory prohibition on our entire EU market. These aren't risks to manage later. They're blockers to operating legally.
+**2. The Buyer is Clear and the Pain is Real**
 
-**The GTM/Investment Committee synthesis is accurate:** this is a conditional build that requires $15-25M in capital (not $8-12M), a 24-36 month realistic timeline (not 18), a Stripe-only initial scope (not multi-network), and completion of five validation gates before full team deployment. The 30-day launch plan and decision tree are operationally credible.
+Every agent agrees on the buyer: compliance officers at payment platforms, with personal liability, owning risk mitigation budgets, who must solve this problem by a hard deadline or face enforcement. This is a rare alignment across PMF, GTM, and CFO agents that you almost never see in early-stage evaluation. Most failed products fail because the buyer persona is ambiguous. This one isn't.
 
-### Why This Is NEEDS_HUMAN_REVIEW, Not NO-GO
+**3. Incumbent Risk is Real but Not Disqualifying — Yet**
 
-I want to be precise here, because there's a meaningful difference.
+The PMF agent put incumbent co-option probability at moderate. The CFO agent put it at 40-50%. The GTM agent built the entire launch plan around shipping by July 2026 specifically to beat Datadog and Wandb to market. There is strong convergence that: (a) you have a 12-18 month window, (b) that window is genuinely finite, and (c) the strategy of moving fast and locking in customers before incumbents pile in is the right call. None of the agents believes incumbents are an immediate fatal threat. All agents believe they become a fatal threat by Q3-Q4 2026 if you're not established.
 
-**This is not a bad opportunity.** The infrastructure gap is real. The moat thesis is defensible. The sequencing is logical. In different conditions — with validation gates completed, capital appropriately sized, legal framework in place, and scope narrowed to Stripe-only — this clears the bar.
+**4. The Agent Attribution Problem is Genuinely Hard**
 
-**This is an opportunity that has not yet been sufficiently de-risked for an automated GO decision.** Three agents are below 0.70 confidence. The average falls at 0.64. The gaps are not minor adjustments — they are structural: the revenue model needs re-underwriting, the technical scope needs re-specification, the legal framework needs negotiation with processors before a single line of product code is written, and the capital raise needs to be doubled.
+The CTO agent surfaced the most important technical risk nobody else fully grappled with: **how do you cryptographically bind an agent action to a payment event in a way that survives legal scrutiny?** This is not a solved problem. The LLM inference call has no payment-grade identity. The tool call has whatever the agent framework provides. The payment API call has Stripe's idempotency key. Binding these causally requires either deep agent framework integration (partnership dependency), a proxy layer (adoption friction), or correlation IDs (may not satisfy regulators). The General Counsel agent reinforced this from a liability direction: false agent attribution creates litigation exposure, and the legal standard of care for audit trail completeness is undefined.
 
-A GO decision at this moment would mean committing $15-25M (once properly scoped) to a build with:
-- Unvalidated customer pain severity (80% threshold not yet confirmed)
-- No signed processor partnership commitments
-- No regulatory clarity on PSD3 SCA applicability to agent transactions
-- No liability allocation agreement with any processor
-- No AML/KYC framework for agent operators
-- A technical timeline that is 2x understated even on the CTO's narrowed scope
+This is the core technical differentiator you're selling. If you can't solve it cleanly, you're selling a Stripe log reformatter, not an audit trail. That's a commodity.
 
-That is not a decision I will make without a human investment committee reviewing it with full context. This opportunity deserves that review — it doesn't deserve a rubber stamp in either direction.
+**5. The Financial Math Works — But Only at Sufficient Customer Volume**
+
+The CFO agent did the most rigorous unit economics work in the brief. At Base Case (8-12 customers, ~$140K ACV), gross margins reach 62-75% with a path to profitability in Q2-Q3 2028. The Year 1 net loss of $766K-$846K is appropriate for a venture-backed infrastructure company. However, the CFO agent identified a critical sensitivity: **if customer acquisition drops to 4-6 (conservative case because regulatory deadline slips or sales cycles elongate), gross margins fall to 45-55% and the company hits the Series A wall 6-9 months early.** The financial model has almost no buffer in the conservative scenario.
 
 ---
 
-## KEY WINNING ARGUMENTS
+### Where Agents Diverged (KEY TENSIONS)
 
-1. **Documented architectural friction is real.** PSD2/PSD3 human-in-the-loop authentication requirements are not speculative. Payment networks are publicly searching for machine identity standards. This is a genuine gap, not a manufactured one.
+**Tension 1: MVP Scope — Ship Fast vs. Ship Right**
 
-2. **First-mover standardization creates defensible lock-in.** If we can shape the agent identity specification before card networks build their own, switching costs become structural. Fraud system retraining and regulatory re-certification create high barriers for later entrants. The TLS and EMVCo analogies hold.
+The PMF agent wants to ship Stripe-only MVP in 3 weeks to validate before committing. The CTO agent says a production-ready MVP requires 14-18 weeks with 4-6 engineers — there's no 3-week shortcut to production quality in financial compliance infrastructure. The GTM agent needs to start pilot agreements in Week 4 with a July 2026 ship date.
 
-3. **B2B2D sequencing is commercially sound.** Starting with payment processors (institutional buyers with budget and compliance urgency) before developers de-risks revenue. Stripe-only scope is achievable. Parallel fraud platform conversations can generate licensing revenue while infrastructure matures.
+**My read:** The CTO is right about production quality timelines. The PMF agent's "3-week PoC" framing is a validation prototype, not an MVP. These are compatible if properly scoped: Week 3-4 PoC for internal validation, then 14-week full build beginning Week 5. The GTM timeline works if you pre-sell in May-June and ship production in late July. This is tight but achievable.
 
-4. **Timing window is real but narrow.** PSD3 finalization in May 2026 creates urgency. The 6-12 month window before major processors decide to build in-house is genuine. Engaging PSD3 working groups immediately (Month 1) is the right move regardless of final decision.
+**Tension 2: Immutability Architecture Decision**
 
-5. **Regulatory positioning as compliance-enabler (not disruptor) reduces incumbent pushback.** This is a smart framing that reduces the probability of regulatory capture by Visa/Mastercard. It also makes processor partnerships more likely — we're solving their compliance problem, not competing with their revenue.
+The CTO agent identified that "immutable" is simultaneously a technical term and a legal term, and that the storage architecture decision (centralized append-only vs. blockchain-anchored vs. regulated custodian) has to be made before engineering starts — but the right choice depends on the regulatory definition of "immutable" in the final rule. The General Counsel agent reinforced this: wrong architecture choice means rework in weeks 8-12 of the build, potentially missing August 2026.
 
----
+**My read:** This is a genuine sequencing problem. You cannot finalize storage architecture without regulatory counsel confirming what "immutable" means under the August 2026 rule. This is a Week 1-2 dependency that gates the entire engineering plan. The CTO's recommendation of Option A (centralized append-only + hash chaining + RFC 3161 timestamping) is the right default, but it must be validated by regulatory counsel before engineering commits.
 
-## KEY RISKS
+**Tension 3: GDPR vs. Immutability**
 
-1. **Liability framework vacuum is existential.** No insurance, no processor TOS clarity, no chargeback reserve, no regulatory safe harbor — the first significant agent transaction dispute could be company-ending. This must be resolved before any production transactions.
+The General Counsel agent surfaced a conflict that none of the other agents addressed: **GDPR right to erasure directly conflicts with the immutability requirement.** Payment audit logs contain personal data. GDPR says data subjects can demand deletion. You can't delete from an immutable log. There are legal frameworks for resolving this (legitimate interest exception, pseudonymization/hashing approach), but they need explicit legal design before you finalize the data model.
 
-2. **Technical timeline is 2x understated on CTO's narrowed scope, 4x understated on full scope.** First real production transaction with Stripe only: 16-22 months (CTO estimate). Full network integration: 36-48 months. The 18-month roadmap in the brief is not executable as written.
-
-3. **Capital requirements are understated by $5-10M.** Realistic Series A: $15-18M minimum (not $8-12M). Compliance infrastructure alone (PCI-DSS, AML screening, regulatory counsel, security audits) will consume $1.4-2.2M annually before product engineering begins.
-
-4. **PSD3 SCA incompatibility could prohibit EU market.** If the strict reading applies — that SCA is required on every transaction regardless of delegation — agent payments are prohibited in the EU until regulatory guidance clarifies. This is a potential total market loss in our primary geography.
-
-5. **Payment network build-in-house risk is the strategic throat.** Visa and Mastercard have $1T+ in resources. If they decide agent payments are strategic, they build their own spec in 18-24 months and lock us out via EMVCo working group capture. Speed to Stripe partnership and PSD3 working group engagement is the only mitigation.
-
-6. **Agent adoption velocity assumption (2% by 2027) is unsupported.** If agent commerce reaches 0.1-0.5% by 2027 (more plausible), the transaction fee revenue model shifts 3-5 years. Time to profitability extends from Year 3 to Year 5-6. The capital required to survive that extension has not been raised.
-
-7. **Cryptographic agent identity is an unsolved engineering problem.** The brief assumes it's a known task. It is not. Agent identity binding, hardware root of trust alternatives, delegation chain verification, key management at scale, and replay attack prevention — each of these requires dedicated cryptographic expertise that doesn't yet exist at the intersection of payments and AI. Hiring timeline alone: 3-6 months for a qualified cryptographer.
+**My read:** This is a solvable problem but not a trivial one. It requires GDPR counsel in Week 1-2 and explicit data model decisions before engineering starts. If you have EU customers (likely for any payment platform with EU operations), this is not optional.
 
 ---
 
-## CONDITIONS FOR HUMAN REVIEW COMMITTEE
+## KEY WINNING ARGUMENTS (If Validated)
 
-The investment committee should evaluate this opportunity with the following specific questions:
+1. **Regulatory forcing function creates unambiguous, time-bounded buyer urgency.** This is not TAM speculation — it's a compliance mandate with enforcement risk. Compliance officers face personal liability. Sales cycles compress from 12 weeks to 6 weeks. This is the rarest thing in B2B: pull-based demand from an external forcing function.
 
-### Capital & Financial Questions
-- Are we prepared to commit $15-25M (not $8-12M) for a 24-36 month program before profitability?
-- Is the venture return thesis still valid at a 4-5 year payback period in the base case?
-- Do we have a $2-5M contingent liability reserve budgeted for chargeback/fraud losses in Year 1?
-- What is our Series A strategy and target timeline? Can we close $15-18M before Month 10 given current market conditions?
+2. **Clear buyer with unambiguous budget authority.** Compliance officers own risk mitigation budgets. They have authority to sign $50K-$500K contracts without going through engineering-led procurement cycles. The buyer clarity here is exceptional.
 
-### Legal & Regulatory Questions
-- Will the board authorize operating in regulatory gray zone (no processor TOS clarity, no liability framework) during the validation sprint?
-- What is our risk tolerance for a first significant adverse agent transaction event before legal framework is in place?
-- Who is the designated regulatory affairs lead for PSD3 working group engagement starting Month 1?
-- Are we prepared to file a formal regulatory interpretation request with EBA on SCA applicability before EU launch?
+3. **12-18 month window before incumbent co-option.** Datadog and Wandb are building horizontal observability, not vertical payment compliance. The window is finite but real. First-mover who ships by August 2026 and locks in 8-12 customers has switching cost advantages (audit data portability, certification relationships, regulatory familiarity) that incumbents can't replicate by simply adding a feature.
 
-### Strategic Questions
-- Do we have board-level relationships at Stripe, Adyen, or Mastercard that can accelerate partnership conversations beyond cold outreach?
-- Is the committee prepared to KILL this opportunity if fewer than 3 of 5 validation gates pass by end of Month 1?
-- What is the opportunity cost? What alternative fintech infrastructure plays would receive this capital if we don't proceed?
-- Are we willing to accept a Stripe-only scope for 24 months, forgoing the multi-network narrative?
+4. **Execution complexity is bounded.** You're not solving payment protocol standardization (the hardest problem). You're building a translation and compliance layer on top of existing infrastructure. The CTO's 14-18 week estimate with 4-6 engineers is realistic and not heroic.
 
-### Execution Questions
-- Who is the CEO/GM of this business unit? Do we have a candidate who has shipped payment infrastructure at scale?
-- What is our plan if the VP of Infrastructure hire takes 4-6 months instead of 1-2?
-- Is there a board member or senior advisor with active payment network relationships (former Stripe/Visa/Mastercard executive) who can accelerate processor conversations?
+5. **Unit economics work at scale.** 62-75% gross margins in Year 1, path to 75-80% in Year 2, EBITDA breakeven in Q2-Q3 2028. The financial profile is appropriate for a venture-backed compliance infrastructure company.
 
 ---
 
-## RECOMMENDED IMMEDIATE ACTIONS (PENDING COMMITTEE DECISION)
+## KEY RISKS (That Must Be Resolved)
 
-Regardless of committee outcome, these actions should begin immediately at low cost and preserve optionality:
+1. **CRITICAL — Regulatory Deadline is Unvalidated.** The entire thesis depends on an August 2026 mandate that has not been confirmed by independent regulatory counsel or compliance officer interviews. If the deadline slips, narrows, or is advisory, Year 1 revenue misses by 70% and the company's financial model collapses. This must be validated in Week 1-2 before any engineering capital is committed. *Confidence impact: -0.12 across agents.*
 
-1. **Engage regulatory advisor** (former EBA/ECB official, 30-day contract) to produce memo on PSD3 SCA applicability to agent transactions. Cost: €30-50K. Timeline: 2-3 weeks. This is the fastest way to determine if the EU market is viable at all.
+2. **HIGH — Agent Attribution is Genuinely Unsolved.** The core technical differentiator — cryptographically binding agent actions to payment events — is an unsolved problem in the industry. No agent framework provides payment-grade identity primitives. Options (proxy layer, deep framework integration, correlation IDs) each have significant friction or legal weakness. If this can't be solved cleanly within the timeline, the product becomes a Stripe log reformatter. *Confidence impact: -0.08 across agents.*
 
-2. **Initiate Stripe partnership scoping conversation** at CPO/VP Innovation level. Do not commit engineering resources or legal budget — just a conversation to determine if Stripe sees this as a partner problem or an in-house build. This conversation has near-zero cost and high information value.
+3. **HIGH — GDPR vs. Immutability Conflict.** Right to erasure conflicts structurally with immutable audit logs. Requires explicit legal design and regulatory counsel before data model is finalized. EU customer base (likely for any global payment platform) makes this non-optional. *Confidence impact: -0.05.*
 
-3. **Commission 10 enterprise customer depth interviews** (not 15 — start smaller, move faster). Focus exclusively on Fortune 500 companies with active AI procurement pilots. Single question: "Is payment authorization your #1 or top-3 blocker to agent deployment?" Cost: $20-40K (external research firm or internal BD time). Timeline: 3 weeks. This is the data point that changes everything.
+4. **HIGH — Incumbent Co-option Timeline.** Datadog and Wandb could announce payment audit compliance within 6-9 months. If either announces before you establish market presence (target: $300K-$500K ARR by September 2026), pricing pressure compresses your TAM by 40-60%. *Probability: 40-50%.*
 
-4. **Engage one AML compliance specialist** (1099, 60-day engagement) to produce a preliminary AML/KYC framework for agent operators. Cost: $40-60K. This will be required for any processor partnership conversation — get ahead of it now.
+5. **MEDIUM — Infrastructure Cost Surprises.** Exactly-once delivery at scale, 7-year data retention costs, HSM key management, PCI DSS Level 1 certification ($50K-$100K), and SOC 2 Type II audit overhead are not fully modeled in the financial projections. At conservative customer volume (4-6 customers), gross margins could drop to 45-55%, below SaaS benchmarks. *Confidence impact: -0.04.*
 
-5. **Do not hire a full team.** Freeze all hiring beyond the regulatory advisor and AML specialist until committee decision is made and validation gates are underway. Do not burn capital on headcount before we know if the five gates pass.
+6. **MEDIUM — Sales Cycle vs. Deadline Risk.** If average enterprise sales cycle is 10-12 weeks and you don't pre-sell in May 2026, you miss the forcing function entirely. The GTM plan requires pilot commitments in Week 4 (late April/early May) to ship by late July. This timeline has no buffer for slip.
 
 ---
 
-## FINAL STATEMENT
+## WHAT HUMAN REVIEW NEEDS TO DECIDE
 
-This is a real opportunity in a real market gap at a real moment in time. The technical merit is sound. The strategic positioning is defensible. The sequencing is logical. Any of the five agents working alone might have said GO. Working together, they've correctly identified that the cumulative weight of validation gaps — on customer pain severity, processor commitment, legal framework, capital adequacy, and technical timeline — puts this below the confidence threshold for an automated commitment.
+I am asking the human decision-maker to evaluate three specific, time-bounded questions. This is not an open-ended review. It has a two-week deadline.
 
-**The right answer is not GO or NO-GO. The right answer is: send this to the human committee with a clear brief, a defined decision tree, and a low-cost 30-day validation sprint running in parallel.**
+**Question 1: Is August 2026 a hard regulatory deadline?**
 
-If the committee convenes, reviews the full agent analysis, resolves the capital question, confirms legal risk tolerance, and approves the validation sprint — and if at least 3 of 5 gates pass by end of Month 1 — I will support a GO decision on Rank 1 (Stripe-only scope, $15-18M Series A, 24-month timeline, OAuth-based identity not novel cryptography).
+Commission external fintech regulatory counsel immediately. Get a written memo within 7 business days confirming:
+- Whether August 2026 audit trail deadline is in a published final rule (not proposed, not advisory)
+- Exact scope: which entities, which transaction types, which agent definitions
+- What "immutable" means technically under the rule
+- Who bears liability for audit trail integrity
 
-Until then: **NEEDS_HUMAN_REVIEW.**
+**Decision rule:** If memo confirms hard deadline → proceed to GO. If memo confirms advisory/proposed guidance → hold. If deadline is soft or scope is narrow → NO-GO.
 
-**Average Confidence: 0.64 | Threshold: 0.70 | Verdict: NEEDS_HUMAN_REVIEW**
+**Question 2: Will 2 or more target buyers pre-commit at $50K+ ACV?**
+
+Run 5 compliance officer interviews in parallel with regulatory research. Do not wait for regulatory memo to start conversations. Ask directly:
+- Is this deadline driving budget allocation right now?
+- Would you buy this (not build) if it shipped by July 2026?
+- What ACV is defensible to your CFO?
+
+**Decision rule:** If 2+ buyers express willingness to pre-commit at $50K+ ACV → high confidence. If buyers are lukewarm or budgets are unclear → defer.
+
+**Question 3: Can the CTO confirm agent attribution is solvable within the 14-18 week timeline?**
+
+The CTO should engage 3-5 agent framework teams (LangChain, LlamaIndex, enterprise agent vendors) in Week 1 to understand what identity/signing primitives they expose today. Simultaneously engage regulatory counsel to clarify whether correlation IDs are legally sufficient or cryptographic binding is required.
+
+**Decision rule:** If correlation IDs are legally sufficient → MVP is feasible in 14-18 weeks. If cryptographic binding is required and no framework provides signing primitives → add 6-8 weeks to timeline, which may push delivery past August 2026.
+
+---
+
+## PROVISIONAL RECOMMENDATION IF HUMAN REVIEW PASSES
+
+If all three questions above resolve positively in Weeks 1-2:
+
+**UPGRADE TO GO WITH THE FOLLOWING CONDITIONS:**
+
+1. **Do NOT commit engineering capital until regulatory memo is received.** Week 1-2 is discovery only. Engineering begins Week 3 at earliest.
+
+2. **Build Stripe-only first.** Ship Stripe integration and compliance dashboard as V1. Add Adyen/Square post-August 2026. Do not attempt N×M payment platform coverage in V1.
+
+3. **Scope down agent attribution for V1.** Ship with correlation ID approach initially. Use regulatory counsel's guidance to determine whether cryptographic binding is required and at what timeline. Do not let agent attribution perfection delay the August 2026 ship date.
+
+4. **Pre-sell aggressively in May 2026.** GTM team secures 2-3 pilot commitments (non-paying but committed) before engineering starts full build. July ship date is the hard constraint.
+
+5. **Hire PCI counsel and GDPR counsel in Week 1.** Do not finalize data model without both. These are not optional gate items.
+
+6. **Model infrastructure costs by customer volume tier explicitly.** Do not commit to flat platform pricing until you have confirmed gross margins at each volume tier (1M, 10M, 50M events/month). Per-transaction overage pricing must be calibrated to actual COGS.
+
+7. **Start SOC 2 Type I in Month 2.** You need SOC 2 certification to close enterprise customers. It takes 4-6 months. Start early or it will block Q3 2026 enterprise deals.
+
+---
+
+## IF HUMAN REVIEW FAILS
+
+If regulatory deadline is soft, or buyers are lukewarm, or agent attribution requires 6+ additional weeks:
+
+**DEFER to Q3 2026.** Reassess when:
+- Final rule is published with enforcement date confirmed
+- At least 2 payment platforms have expressed budget commitment in writing
+- Agent framework landscape clarifies identity/signing primitives
+- Incumbent

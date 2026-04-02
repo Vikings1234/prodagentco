@@ -1,286 +1,154 @@
-# EXECUTIVE BRIEF: AGENTIC COMMERCE PAYMENT INFRASTRUCTURE PRIORITIES
-## Strategic Opportunity Selection & Recommendation
-**March 2026**
+# discovery-brief.md
+
+## Executive Brief: Agent Payment & Compliance Opportunities
+**April 2026 Market Window | Strategic Opportunity Analysis**
 
 ---
 
-## EXECUTIVE SUMMARY
+## Market Context
 
-Agentic commerce is blocked by fundamental infrastructure gaps, not incremental integration challenges. Our research identified nine opportunity areas across three layers: **authentication & fraud** (highest urgency), **developer enablement** (highest leverage), and **regulatory/operational** (foundational but slower-moving).
-
-We recommend a **phased two-front strategy**:
-1. **Lead play (NOW)**: Infrastructure Gap in Payment Rails (ID: 2)
-2. **Parallel play (CONCURRENT)**: Fraud Detection for AI Agents (ID: 1)
-3. **Developer acceleration (FOLLOW)**: Agent Payment APIs (ID: 9)
-
-This brief synthesizes ICE scores with market timing, competitive positioning, and builder capability to identify where we can create defensible moats and capture disproportionate value.
+Four competing signals emerged from April 2026 market research across payment infrastructure, compliance, and fintech developer communities. The agent payment ecosystem is fragmenting across protocol standards, regulatory deadlines, and data freshness challenges. This brief distills high-confidence opportunities into a ranked shortlist with strategic timing rationale.
 
 ---
 
-## RANKED OPPORTUNITY SHORTLIST
+## Ranked Shortlist
 
-### 🥇 **RANK 1: Infrastructure Gap — Payment Rails for Autonomous Transactions**
+### 🥇 LEAD RECOMMENDATION: Agent Transaction Auditing & Observability (SIGNAL_007)
 
-**Opportunity ID:** 2  
-**ICE Score:** 840 | **TAM:** $3T | **Moat:** 8/10 | **Competition:** 6/10
+**Why Now:** August 2026 regulatory deadline creates a forcing function—not a nice-to-have, a compliance requirement. Market is 4 months from enforcement. Early entrants (Custodi, Next Kick Labs) are emerging but fragmented. First-mover advantage in standardized audit trail framework expires in Q3 2026.
 
-#### Why Now
+**Why Us:** 
+- High-impact regulatory window (Impact: 9/10)
+- Moderate execution complexity (Ease: 6/10)—integrable without protocol wars
+- Unambiguous buyer: compliance teams + payment platform operators
+- $1.1B TAM (2026-2029) addresses real payment audit gaps
+- Technical moat: immutable audit trails + payment-specific observability integration
 
-The payment infrastructure built over 30+ years has an embedded assumption: **a human is in the transaction loop**. PSD2 regulatory frameworks, 3D Secure authentication, and card network architectures all expect human verification presence. With agentic AI entering production (Claude tool use, GPT-4 agents, LLaMA deployments), this foundational incompatibility is no longer theoretical—it's a hard blocker.
+**The Problem:** Autonomous agents executing payments today lack immutable, standardized audit trails. Existing observability tools (Datadog, Wandb) capture *what agents claim* to do; visual proof of *what they actually did* is fragmented. Seven critical audit events (transaction initiation, settlement, reversal, etc.) have no standardized logging format. Regulatory deadline August 2026 mandates critical audit events for every agent payment.
 
-**Market timing signals:**
-- Enterprise AI deployments (Fortune 500) are hitting this wall in Q1-Q2 2026
-- PSD3 finalization (May 2026) will cement human-authentication assumptions further into EU regulation
-- Payment networks (Visa, Mastercard, SWIFT) are scrambling to define machine-identity standards with no clear winner
-- Estimated $3T in commerce volume waits on the other side
+**Strategic Narrative:** Build the "audit translator" layer between payment platforms (Stripe, Adyen, Square) and observability tools. Position as the missing compliance layer for agent-native payment platforms. Differentiate on immutable event binding + visual proof integration. Enter before regulatory deadline locks in proprietary solutions.
 
-#### Why Us
+**Key Risks:**
+- Regulatory requirement scope may shift before August 2026
+- Incumbent observability vendors (DataDog) may co-opt functionality
+- Adoption friction if payment platforms resist third-party audit requirements
+- Complex integration with fragmented payment backend landscape
 
-Our differentiation vector is **not** building another payment processor—it's architecting the **identity and authorization layer** that lets autonomous agents operate credibly within existing payment rails without requiring human presence.
-
-Key capabilities we should develop:
-- **Agent Identity Framework**: Cryptographic proof of agent legitimacy (machine credentials, not API keys)
-- **Consent Modeling for Autonomous Transactions**: Mapping PSD2/PSD3 authorization concepts to agent workflows (pre-authorized spending tiers, budget constraints, transaction categories)
-- **Hybrid Authentication Bridge**: Enable existing payment processors to accept agent-initiated transactions without architectural rewrites
-- **Audit Trail Protocol**: Real-time transaction logging for regulatory compliance (agents still need perfect audit trails)
-
-We can ship this **without** displacing existing payment networks. We become the translation layer—the infrastructure that makes legacy systems agent-compatible.
-
-#### Financial & Strategic Upside
-
-- **TAM**: $3T addressable (all agentic commerce)
-- **Defensible moat**: First-mover lock-in with payment networks + regulatory precedent (hard to dislodge once defined)
-- **Path to revenue**: Licensing identity framework to payment processors ($100M+ annual licensing), transaction fees on autonomous flows (10-50 bps), regulatory compliance consulting
-- **Timeline to market impact**: 12-18 months to pilot with 1-2 Tier-1 payment networks; 24-36 months to industry standard
-
-#### Key Risks & Mitigation
-
-| Risk | Severity | Mitigation |
-|------|----------|-----------|
-| Payment networks build their own solution | High | Partner early with a leader (Stripe, Adyen) on joint specification. Make our framework open-source (regulatory appeal) |
-| Regulatory capture by incumbents | Medium | Engage PSD3 working groups NOW. Position as pro-consumer (agent transparency). |
-| Agent adoption slower than expected | Low | Real deployment signals exist; enterprise use cases are pulling, not pushing |
-
-#### What We're Betting On
-
-**Agent autonomous transaction volume reaches 2% of global payments by 2027** (today ~0.001%). This infrastructure layer becomes as critical as SSL/TLS was for internet commerce.
+**Suggested Debate Focus:**
+1. Which seven audit events are truly "critical" per regulator? Validate with compliance legal.
+2. Visual proof integration: blockchain-based immutability vs. centralized append-only logs?
+3. Go-to-market: compliance officer purchase vs. engineering-led adoption?
+4. Pricing model: per-transaction audit logging vs. platform seat licensing?
 
 ---
 
-### 🥈 **RANK 2: Fraud Detection Systems Cannot Distinguish Legitimate AI Agents**
+### 🥈 SECOND CHOICE: Protocol Wars—Agent Payment Protocol Bridge (SIGNAL_008)
 
-**Opportunity ID:** 1  
-**ICE Score:** 740 | **TAM:** $1.5T | **Moat:** 7/10 | **Competition:** 5/10
+**Why Now:** Four incompatible protocols (MPP, AP2, TAP, x402) launched in rapid succession (Oct 2025–Mar 2026). Stripe's momentum (118 PH upvotes, March 2026) suggests winner emerging, but convergence unresolved. Multi-rail platforms (PayJoy, Pay3) must integrate all four. Integration debt accrues *today*; standardization window closes in Q3–Q4 2026.
 
-#### Why Now
+**Why Us:**
+- Massive TAM: $15.3B agent payment infrastructure market
+- High-confidence problem signal (Confidence: 9/10)—Stripe, Google, Visa all validate
+- Unserved segment: orchestration platforms need bridge layers
+- First standardized bridge could become de facto integration layer
 
-The fraud detection paradox: **AI agent transactions look exactly like fraud**. Non-human patterns, high velocity, impossible-human timing, novel merchant categories—all are fraud signals *and* agent signals simultaneously. Current fraud systems (rules-based or legacy ML) are optimized for human behavior and treat agent transactions as threats.
+**The Problem:** Each protocol specifies different agent identification schemes, fraud signal formats, and settlement coordination. Platforms supporting multi-rail payments must maintain separate integration pipelines for MPP, AP2, TAP, and x402. No standardized bridge exists. Developers face N×M integration complexity.
 
-**Tangible market pain:**
-- 16% consumer trust in AI-initiated payments (our research)
-- Payment blocks on legitimate agent transactions cause cascading failures in agentic workflows
-- Merchants see higher chargeback rates on agent orders (unclear liability)
-- Fraud teams lack explainability tools to distinguish legitimate agents from botnets
+**Strategic Narrative:** Build the universal agent-payment protocol adapter. Position as Switzerland in protocol wars—translate between Stripe MPP, Google AP2, Visa TAP, and x402. Aim for adoption by multi-rail orchestration platforms (PayJoy, agent marketplaces). Win by becoming indispensable translation layer before one protocol dominates.
 
-This is a **trust crisis**, not a detection crisis. Solving it unlocks agentic commerce adoption.
+**Key Risks:**
+- **Highest execution risk:** If Stripe MPP becomes dominant standard by Q3 2026, bridge becomes obsolete
+- Competitive density is high—Stripe, Google, Visa have incumbent relationships
+- Moat strength is average—bridge is replicable once protocol specs stabilize
+- Effort bucket is high—maintaining N protocol versions requires ongoing engineering
 
-#### Why Us
-
-Our angle: **Build the "Agent Passport" — cryptographic proof of agent legitimacy integrated into transaction metadata.**
-
-Rather than re-engineer fraud detection from scratch, we provide fraud systems with a *new signal class*: verifiable agent identity + authorization proof. We let fraud detection say: "This looks unusual, BUT it's from a known agent operating within authorized parameters."
-
-Key capabilities:
-- **Agent Attestation Protocol**: Cryptographic signing of agent identity + transaction authorization (agent doesn't fake this; fraud systems validate it)
-- **Behavior Baseline for Agents**: ML models trained on *legitimate agent patterns*, not human patterns. Detect agent *anomalies*, not agent-ness.
-- **Fraud Dashboard for Agent Operations**: Real-time visibility into agent-triggered fraud alerts, with one-click override for operators
-- **Integration with Fraud Providers**: Partner with Kount, Sift, Feedzai, etc. to embed our agent signal into their detection engines
-
-#### Financial & Strategic Upside
-
-- **TAM**: $1.5T (agentic commerce that needs fraud protection)
-- **Revenue model**: Transaction fee (1-2 bps) on agent-transacted volume, licensing to fraud platforms, white-glove service for enterprise merchants
-- **Defensible moat**: Once fraud systems trust our attestation, switching costs are high (re-training detection models)
-- **Timeline**: 9-12 months to MVP with 2-3 fraud platforms; 18-24 months to widespread adoption
-
-#### Key Risks & Mitigation
-
-| Risk | Severity | Mitigation |
-|------|----------|-----------|
-| Fraud networks game our agent attestation | High | Multi-sig architecture + continuous behavioral monitoring. No static credentials. |
-| Fraud platforms reluctant to integrate | Medium | Build as a *data feed*, not a replacement. Make integration a 2-week engineering lift. |
-| False sense of security (fraud still happens) | Medium | Market as a *risk reducer*, not risk eliminator. Transparency on limits. |
-
-#### What We're Betting On
-
-**Agent transaction risk profiles are meaningfully different from human fraud patterns and can be modeled separately.** Once fraud systems have an "agent signal" in their feature set, trust in agentic payments rises to 60%+ and adoption accelerates.
+**Suggested Debate Focus:**
+1. Protocol convergence timeline: Will one protocol win by Q3 2026? If yes, abandon bridge.
+2. Differentiation angle: Why buy our bridge vs. integrating each protocol directly?
+3. Network effects: Can we lock in multi-rail platforms before Stripe/Google offer native bridges?
+4. Revenue model: Per-transaction routing fee vs. flat platform licensing vs. SaaS per integration?
 
 ---
 
-### 🥉 **RANK 3: Developer Experience — How to Enable Agents to Safely Spend Money**
+### 🥉 THIRD CHOICE: PCI-DSS Compliance Automation for LLM Agents (SIGNAL_006)
 
-**Opportunity ID:** 9  
-**ICE Score:** 620 | **TAM:** $200M | **Moat:** 6/10 | **Competition:** 4/10
+**Why Now:** PCI Security Standards Council published AI Principles (March 2026) but no reference implementations exist in major payment SDKs (Stripe, Adyen, Square). Developers must custom-build PCI frameworks per agent. This is slower burn than auditing deadline, but growing urgency as agents scale into production payment systems.
 
-#### Why Now
+**Why Us:**
+- Clear pain point: developers building custom PCI frameworks today
+- Growing market: enterprise agents entering payment processing
+- $800M TAM (2026-2029) addresses real compliance gap
+- Technical leverage: can integrate with payment SDKs as reference implementation
 
-Developers building AI agents ask a simple question with no simple answer: **"How do I let my agent buy things?"**
+**The Problem:** LLM agents handling payment flows create ambiguous PCI-DSS scope. Should agents see tokenized CVV? How to audit card data exposure? Echoing tokenized CVV in LLM responses violates security practices but is poorly defined in PCI standards. Zero-storage architectures (Hoop.dev) exist but lack adoption in payment SDKs.
 
-Right now, the answer requires:
-- Custom wallet infrastructure (or integrating 3+ payment SDKs)
-- Manual security compliance (PCI, AML, KYC)
-- Building transaction authorization logic from scratch
-- Managing agent-to-payment-processor communication
+**Strategic Narrative:** Become the "PCI reference implementation for agents"—provide pre-built, audit-compliant agent payment frameworks integrated into Stripe, Adyen, Square SDKs. Position as the security layer for enterprise agents entering payment processing.
 
-This friction is **slowing the entire agentic commerce ecosystem**. Every developer rebuilds the same wheel. Agents that could be productive are blocked waiting for payment infrastructure.
+**Key Risks:**
+- Regulatory scope may shift—PCI Council guidance could change post-2026
+- Payment SDKs may build this internally (Stripe's existing infrastructure advantage)
+- Medium competition density—growing market may attract larger players
+- Moderate TAM relative to auditing opportunity ($800M vs. $1.1B)
 
-#### Why Us
-
-We position this as **the Stripe-moment for agent payments**: a single API that abstracts payment complexity while maintaining security and compliance.
-
-**Agent Payment API** — a developer-friendly SDK that:
-- Creates agent wallets in 3 lines of code
-- Handles all PSD2/PSD3 compliance for agent authorization
-- Provides transaction approval/denial hooks (developer controls policy)
-- Integrates with major processors (Stripe, Adyen, payment networks)
-- Built-in reconciliation and audit logging
-- Sandbox environment for testing agent spending behavior
-
-```python
-# Developer experience we're targeting:
-agent_wallet = agentpay.create_wallet(agent_id="my-agent-123")
-approval = agent_wallet.request_payment(
-    amount=100,
-    merchant="example.com",
-    policy="max_single_100_per_day"
-)
-# Handles: auth, compliance, processor integration, logging
-```
-
-#### Financial & Strategic Upside
-
-- **TAM**: $200M (developer infrastructure)
-- **Revenue model**: SaaS (per-agent, per-transaction), premium compliance features, enterprise support
-- **Defensible moat**: Developer lock-in (switching cost is code rewrite) + integrations with payment processors
-- **Timeline**: 6-9 months to MVP; 12-18 months to $10M ARR run-rate
-
-#### Key Risks & Mitigation
-
-| Risk | Severity | Mitigation |
-|------|----------|-----------|
-| Major payment processors (Stripe) build this | High | Ship first; build on **open standards** so we're not "locked out" if processors move. Position as vendor-agnostic layer. |
-| Developer adoption slower than SaaS metrics | Medium | Target high-volume agent builders first (enterprise AI teams, not solo developers). Freemium model for SMB agents. |
-| Security liability if agents misuse | Medium | Clear terms of service; require developers to implement spending policies. Don't be the custody layer—be the connectivity layer. |
-
-#### What We're Betting On
-
-**Developer time is expensive. A developer saves 4 weeks of payment integration work = $20-40K saved. At scale, this is a $200M+ business.**
+**Suggested Debate Focus:**
+1. SDK partnership path: Should we build SDKs or partner with Stripe/Adyen/Square?
+2. Compliance depth: Zero-storage only, or support tokenized flows with heavy audit?
+3. Buyer persona: CISO purchase vs. engineering team adoption?
+4. Go-to-market: Compliance frameworks marketplace vs. direct payment SDK integration?
 
 ---
 
-## DEPLOYMENT STRATEGY & SEQUENCING
+## Opportunities NOT Recommended (Below Threshold)
 
-### Phase 1: IMMEDIATE (Months 1-4)
-**Lead with Rank 1 (Infrastructure Gap)**
+### ❌ SIGNAL_005: Plaid/Finicity Data Freshness for Agent Credit Decisions
 
-- **Rationale**: This is the foundational unlock. Rank 1 enables both Rank 2 (fraud detection works better with authenticated agents) and Rank 3 (developers need the infrastructure layer). Start here.
-- **Action**: Form a payment-infrastructure task force. Hire a former payment processor architect (VP of Infrastructure). Begin technical engagement with Stripe, Adyen, Mastercard on agent identity specification.
-- **Parallel quick-wins**: Publish open research on "Agent Identity in Payment Networks" (positions us as thought leader). Sponsor PSD3 working groups.
+**Why Deferred:**
+- Slower burn problem (no regulatory deadline forcing urgency)
+- Lower impact vs. transaction auditing (competitive problem in data infrastructure, not payments-specific)
+- High execution complexity (requires real-time data architecture changes)
+- Incumbent advantage: Plaid, Finicity, PSD3 regulators are addressing this independently
+- 54% rate limit hits are painful but addressed by vendor scaling, not new platform
 
-### Phase 2: CONCURRENT (Months 4-8)
-**Add Rank 2 (Fraud Detection)**
-
-- **Rationale**: Once we have an agent identity framework (Rank 1 in beta), we have the signal to solve fraud detection.
-- **Action**: Partner with a Tier-1 fraud platform (Sift, Kount, Feedzai). Begin pilot with a major e-commerce merchant (Amazon, eBay, or similar) to test agent attestation + fraud integration.
-- **Revenue**: First revenue from fraud platform licensing deals.
-
-### Phase 3: SCALE (Months 9-18)
-**Layer in Rank 3 (Developer Experience)**
-
-- **Rationale**: With infrastructure + fraud confidence, developers now have permission to build. Rank 3 removes the last friction point.
-- **Action**: Launch Agent Payment API (public beta). Target developer communities (r/OpenAI, LangChain forums, AnthropicAI). Freemium model for traction.
-- **Revenue**: Developer platform revenue (SaaS + transaction fees).
+**Recommended Action:** Monitor PSD3 implementation timelines (2026-2027). If real-time data standardizes, revisit as feature layer atop auditing infrastructure.
 
 ---
 
-## COMPETITIVE LANDSCAPE & POSITIONING
+## Final Recommendation
 
-### Who Else Is Attacking These?
+**Pursue SIGNAL_007 (Agent Transaction Auditing & Observability) as lead opportunity.**
 
-| Rank | Opportunity | Incumbent Threat | Startup Competitors | Our Advantage |
-|------|-------------|------------------|--------------------|----|
-| 1 | Infrastructure Gap | Visa, Mastercard, SWIFT (slow-moving) | None building this yet | Speed + neutrality (not a payment processor) |
-| 2 | Fraud Detection | Sift, Kount, Feedzai (add features reactively) | None focused on agent attestation | Crypto-first identity layer |
-| 3 | Developer API | Stripe, PayPal (building agent payments) | Magic, Teal (early stage) | Speed to market + open standards |
+### Rationale:
 
-**Our differentiation**: We're not a payment processor trying to add agent features. We're **infrastructure-first**, building the layer that makes *all* payment processors agent-compatible. This is defensible because it's fundamental—like DNS for the internet.
+1. **Regulatory forcing function**: August 2026 deadline creates non-negotiable buyer urgency. Compliance teams *must* solve this.
 
----
+2. **Execution feasibility**: Medium effort (Ease: 6/10) with clear technical path—integrates with existing observability SDKs, doesn't require protocol coordination with Stripe/Google.
 
-## RESOURCE ALLOCATION & TEAM COMPOSITION
+3. **Market window**: 4-month window before regulatory deadline locks in proprietary solutions. First standardized framework becomes platform.
 
-### Rank 1: Infrastructure Gap (LEAD)
-- **Team size**: 12-15 people
-- **Roles**: Payment infrastructure engineer (lead), cryptographer, regulatory affairs, payment processor SMEs, protocol designer
-- **Budget**: $2-3M annual (R&D, regulatory engagement, processor integration)
-- **OKRs**: 
-  - Pilot with 1 Tier-1 processor by Month 9
-  - Publish agent identity specification by Month 6
-  - Achieve 60% payment network buy-in by Month 18
+4. **TAM + buyer clarity**: $1.1B market with clear buyer (compliance + payment operations teams). No ambiguity on who purchases.
 
-### Rank 2: Fraud Detection (CONCURRENT)
-- **Team size**: 8-10 people
-- **Roles**: Fraud domain expert (lead), ML engineer, fraud platform integration engineers
-- **Budget**: $1.5-2M annual
-- **OKRs**:
-  - Partner with 1 fraud platform by Month 6
-  - Reduce false positives on agent transactions by 80% in pilot by Month 9
-  - Achieve 5%+ lift in agent transaction approval rates by Month 12
+5. **Differentiation opportunity**: Can establish immutable audit trail + visual proof as standard before incumbents (DataDog, Wandb) co-opt. Build moat via payment-specific observability integrations.
 
-### Rank 3: Developer API (FOLLOW)
-- **Team size**: 6-8 people
-- **Roles**: API product manager (lead), SDK engineers (2-3), DevOps/compliance engineer
-- **Budget**: $1-1.5M annual
-- **OKRs**:
-  - 100+ beta developers by Month 6
-  - 1,000+ active agents on platform by Month 12
-  - $100K MRR by Month 18
+6. **Adjacent opportunities**: Success positions us for PCI compliance automation (SIGNAL_006) and eventual protocol bridge (SIGNAL_008) as adjacent layers.
+
+### Next Steps:
+
+1. **Week 1-2**: Regulatory validation—interview 3-5 compliance officers + payment platform operators on August 2026 deadline scope and current audit trail gaps.
+2. **Week 3-4**: Technical PoC—build immutable event logging + visual proof integration with one payment platform (recommend Stripe, given Product Hunt momentum).
+3. **Month 2**: Go-to-market model—decide CISO vs. engineering-led adoption path; validate pricing (per-transaction vs. platform licensing).
+4. **Month 3**: Pilot with 2-3 agent payment platforms (PayJoy, agent-native marketplace) to lock in adoption before August 2026 deadline.
 
 ---
 
-## KEY DEBATE POINTS & DECISION GATES
+## Key Metrics to Track
 
-### Before Full Commitment, Challenge These Assumptions:
-
-1. **Agent adoption velocity**: Are we betting on agents reaching 2% of commerce by 2027? What if adoption is slower (1% by 2028)?
-   - *Counter-bet*: Enterprise use cases (procurement, supply chain) are already pulling agent payments. Not hype-driven.
-
-2. **Payment processor receptiveness**: Will Visa/Mastercard/Stripe actually integrate our layer, or will they build in-house?
-   - *Counter-bet*: Processor building takes 2-3 years. We can ship in 12 months. First-mover gets the standard.
-
-3. **Regulatory clarity**: Will PSD3 (May 2026) create a regulatory tailwind or headwind?
-   - *Counter-bet*: Either way, we win. Tail wind = faster adoption. Headwind = urgent need for compliance infrastructure.
-
-4. **Moat sustainability**: Can startups (Magic, Teal) undercut us on the developer API front?
-   - *Counter-bet*: Our moat is *integration depth* (payment networks + fraud platforms), not just the API. Hard to replicate without infrastructure credibility.
-
-### Suggested Debate Focus:
-
-1. **Phasing risk**: Is going "all three" simultaneously overextended, or is the sequencing defensible?
-   - Recommend: Commit fully to Rank 1 (Month 1-8), add Rank 2 only if Rank 1 is on track.
-
-2. **Make vs. buy**: Should we acquire a fraud detection startup or build in-house?
-   - Recommend: Build in-house (12-month timeline is acceptable; acquisitions take 6 months to integrate).
-
-3. **Go-to-market**: Should we sell B2B (processors/merchants) or B2D (developers) first?
-   - Recommend: B2B2D. Rank 1 → Rank 2 → Rank 3. De-risk with institutional buyers before targeting developers.
+| Signal | TAM | Deadline | Effort | Confidence | Recommendation |
+|--------|-----|----------|--------|------------|-----------------|
+| SIGNAL_007 (Auditing) | $1.1B | Aug 2026 | Medium | High | 🥇 LEAD |
+| SIGNAL_008 (Protocol Bridge) | $15.3B | Q3–Q4 2026 | High | High | 🥈 WATCH |
+| SIGNAL_006 (PCI Automation) | $800M | Ongoing | High | Medium | 🥉 SECONDARY |
+| SIGNAL_005 (Data Freshness) | TBD | 2027+ | High | Medium | ❌ DEFER |
 
 ---
 
-## FINANCIAL PROJECTION (24-MONTH HORIZON)
-
-### Revenue Model Stack:
-
-| Product | Unit Economics | Year 1 Target | Year 2 Projection |
-|---------|-----------------|---------------|-------------------|
-| Infrastructure Licensing (Rank 1) | $1-5M per processor deal | $2M (1 pilot) | $20M (4-5 processors) |
+**Document Generated:** April 2026 | **Next Review:** June 2026 (Regulatory validation checkpoint)

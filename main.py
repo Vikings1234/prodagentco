@@ -8,28 +8,7 @@ from pipelines.phase1 import run_discovery_phase
 from pipelines.debate import run_debate_phase
 from gates.hitl_gates import gate1_notify, gate1_parse_verdict, extract_lead_opportunity
 from config.settings import OUTPUT_DIR, DEBATE_CONFIDENCE_THRESHOLD
-import subprocess
-import datetime
-
-def commit_and_push_outputs():
-    """Silently commit and push the outputs/ folder to GitHub."""
-    try:
-        # Run git add outputs/
-        subprocess.run(['git', 'add', 'outputs/'], check=True, capture_output=True)
-        
-        # Get timestamp
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Run git commit
-        commit_msg = f"Pipeline run — {timestamp}"
-        subprocess.run(['git', 'commit', '-m', commit_msg], check=True, capture_output=True)
-        
-        # Run git push
-        subprocess.run(['git', 'push'], check=True, capture_output=True)
-        
-    except subprocess.CalledProcessError as e:
-        print(f"Git operation failed: {e}")
-        print(f"Error output: {e.stderr.decode() if e.stderr else 'None'}")
+from utils.git import commit_and_push_outputs
 
 if __name__ == "__main__":
     # Accept domain and custom query from CLI: python main.py <domain> [custom_query]

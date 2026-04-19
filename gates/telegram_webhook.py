@@ -231,6 +231,7 @@ def trigger_run():
         from pipelines.debate import run_debate_phase
         from gates.hitl_gates import gate1_notify, gate1_parse_verdict
         from config.settings import DEBATE_CONFIDENCE_THRESHOLD
+        from utils.git import commit_and_push_outputs
 
         print(f"\n🚀 Dashboard-triggered run — domain: {domain}")
         result = run_discovery_phase(domain=domain, custom_query=custom_query)
@@ -241,6 +242,8 @@ def trigger_run():
         debate_result = run_debate_phase()
         verdict_file = OUTPUT_DIR / "debate-verdict.md"
         verdict_file.write_text(str(debate_result))
+
+        commit_and_push_outputs(label="Dashboard run")
 
         parsed = gate1_parse_verdict(str(debate_result))
         avg_conf = parsed["avg_confidence"]
